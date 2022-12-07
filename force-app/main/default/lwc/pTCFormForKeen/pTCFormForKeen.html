@@ -1,0 +1,142 @@
+<template>
+    <div class="print-preview-div1">
+       
+    </div>
+    
+    <div id="screenshotcanvas" class="screenshotcanvas">
+    <canvas class="my_canvas_id slds-hide">
+    
+    </canvas>
+    </div>
+    
+    <img src={imgsrc} class="lightense"/>
+
+
+    <div class="slds-box slds-p-around_none slds-m-top_x-small slds-m-bottom_medium slds-m-horizontal_none slds-align_absolute-center">
+        <lightning-card class="abca">
+
+            <lightning-layout>
+                <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="3">
+                    <!-- <div class="slds-col slds-size_5-of-6"><img src={keenLogoUrl}></div>     -->
+                </lightning-layout-item> 
+                <lightning-layout-item padding="around-medium" size="12" small-device-size="12" medium-device-size="9">
+                    <div class="slds-text-heading_medium"><b>Sign up to get help with your Medicare insurance needs. </b>Keen is an insurance agency that offers a no cost, no obligation service to help you understand Medicare plan options. We will only use your information for this purpose.
+                    </div>    
+                </lightning-layout-item>       
+            </lightning-layout>
+
+            <lightning-layout multiple-rows>
+                <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="6">
+                    <label class="newLabel">First Name*</label>
+                    <lightning-input variant="label-hidden" class="fieldvalidate" required name="firstName" value={strfirstName}
+                    onchange={ChangedHandler}></lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="6">
+                    <label class="newLabel">Last Name*</label>
+                    <lightning-input variant="label-hidden" class="fieldvalidate" required label="Last Name" name="lastName" value={strlastName}
+                    onchange={ChangedHandler}></lightning-input>
+                </lightning-layout-item>            
+            </lightning-layout>
+
+            <lightning-layout multiple-rows>
+                <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="6">
+                    <label class="newLabel">Phone*</label>
+                    <lightning-input variant="label-hidden" class="fieldvalidate" required type="tel" pattern="[0-9]{10}$" message-when-pattern-mismatch="Please enter a valid phone number" name="accountPhone" value={strPhone}
+                    onchange={ChangedHandler}></lightning-input>
+                </lightning-layout-item>
+
+                <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="6">
+                    <label class="newLabel">Zip Code*</label>
+                    <lightning-input variant="label-hidden" class="fieldvalidate" required type="tel" pattern="[0-9]{5}$" message-when-pattern-mismatch="Please enter a valid zip code" name="ZipCode" value={zipCode}
+                    onchange={ChangedHandler}></lightning-input>
+                </lightning-layout-item>            
+            </lightning-layout>
+
+            <lightning-layout>
+                <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="6">
+                    <label class="newLabel">Email</label>
+                    <lightning-input variant="label-hidden" class="abc" name="Email" value={email}
+                    onchange={ChangedHandler}></lightning-input>
+                </lightning-layout-item>                
+            </lightning-layout>
+            
+            <lightning-layout >
+                <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="6">
+                    <label class="newLabel">Medicare Eligibility Date</label>
+                    <lightning-input variant="label-hidden" class="abc" type="date" name="MedicareEligibilityDate" value={MedicareEligibilityDate}
+                    onchange={ChangedHandler}></lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="6">
+                    <label class="newLabel">Medicaid Eligibility Date</label>
+                    <lightning-input variant="label-hidden" class="abc" type="date" name="MedicaidEligibilityDate" value={MedicaidEligibilityDate}
+                    onchange={ChangedHandler}></lightning-input> 
+                </lightning-layout-item>                
+            </lightning-layout>
+
+            <lightning-layout>
+                
+                    <div class="slds-col slds-size_6-of-12" style="padding: 6px; margin:6px">
+                        <label class="newLabel">Best Day to Call</label>
+                        <lightning-checkbox-group name="Days"
+                        class="checkboxClass"
+                        variant="label-hidden"
+                        style="padding : 4px;"
+                        options={days}
+                        value={valueDays}
+                        onchange={handleChangeforDays}>
+                        </lightning-checkbox-group> 
+                    </div>      
+                <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="6">
+                    <label class="newLabel">Best Time to call</label>
+                    <lightning-input variant="label-hidden" class="abc" type="text" name="bestDatetimetoCall" value={bestDatetimetoCall} 
+                    onchange={ChangedHandler}></lightning-input>
+                </lightning-layout-item>                        
+            </lightning-layout>
+
+            <!-- <lightning-layout>
+                <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="6">
+                    <label class="newLabel">Best Time to call</label>
+                    <lightning-input variant="label-hidden" class="abc" type="text" name="bestDatetimetoCall" value={bestDatetimetoCall} 
+                    onchange={ChangedHandler}></lightning-input>
+                </lightning-layout-item>        
+            </lightning-layout> -->
+
+            <div class="slds-col slds-size_1-of-1" style="border: 0px solid;padding: 17px; margin:17px; width: 1150px">
+                <label class="newLabel">Which describes your current Medicare insurance status?</label>
+                <lightning-checkbox-group name="InsuranceStatus"
+                    options={options}
+                    variant="label-hidden"
+                    value={value}
+                    onchange={handleChangeforOptions}>
+                </lightning-checkbox-group>                    
+            </div>
+
+            <div class="slds-form-element slds-col slds-size_1-of-1" style="padding:20px">
+                <div class="slds-form-element__control">
+                    <div>
+                        <lightning-layout multiple-rows>                                                                
+                            <label>By filling out this form I provide my consent to allow Keen Insurance Services, Inc. to contact me at the phone number and/or email address I provided above, including via automated technology, with informational and promotional messages related to Keen Insurance Services, Inc. I acknowledge that my consent is not a condition of any purchase.</label>
+                        </lightning-layout>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slds-align_absolute-center">
+                <c-signature-Panel onprogressvaluechange={handleProgressValueChange}></c-signature-Panel>
+            </div>
+            
+            <div class="slds-align_absolute-center" style="height:5rem">
+                <lightning-button class="slds-m-left_x-small" label="Clear Signature" variant="brand" 
+                onclick={clearSignature}></lightning-button>
+
+                <lightning-button class="slds-m-left_x-small" label="Submit" variant="brand" 
+                onclick={createAccount}></lightning-button>
+            </div>
+        </lightning-card>
+        </div>
+<!--
+</div>
+</div>-->
+
+
+</template>

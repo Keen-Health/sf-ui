@@ -1,0 +1,205 @@
+<template>
+     <lightning-card>
+     <lightning-accordion allow-multiple-sections-open
+      >
+<lightning-accordion-section name="A" label="Capture Full Member Detail">
+     <lightning-card>
+
+          <lightning-layout horizontal-align	= "center" multiple-rows= "true">
+             <lightning-layout-item class="slds-m-vertical_xxx-small"  size="6">
+                  <lightning-button label="Plans(0)" data-id="plans" title="Plans" onclick={handlePlanClick}  icon-name="utility:add" style="display: grid; width: 100%">
+                  </lightning-button>
+             </lightning-layout-item>
+              
+              <lightning-layout-item class="slds-m-vertical_xxx-small" size="6">
+                  <lightning-button label="CareGivers(0)" title="Care Givers" data-id="caregiver" onclick={handleCareGiverClick} icon-name="utility:add"  style="display: grid; width: 100%">
+                  </lightning-button>
+             </lightning-layout-item>
+             <lightning-layout-item class="slds-m-vertical_xxx-small" size="6">
+                  <lightning-button label="Practices(0)" title="Practices" data-id="practices" onclick={handlePracticeClick} icon-name="utility:add" style="display: grid; width: 100%">
+                  </lightning-button>
+             </lightning-layout-item>
+              <lightning-layout-item class="slds-m-vertical_xxx-small" size="6">
+                  <lightning-button label="Medications(0)" data-id="medications" title="Medications" onclick={handleMedication} icon-name="utility:add" style="display: grid; width: 100%">
+                  </lightning-button>
+             </lightning-layout-item>
+                 <lightning-layout-item class="slds-m-vertical_xxx-small" size="6">
+                  <lightning-button label="Hospitals(0)" data-id="hospitals" title="Hospitals" onclick={handleHospital} icon-name="utility:add" style="display: grid; width: 100%">
+                  </lightning-button>
+             </lightning-layout-item>
+              <lightning-layout-item class="slds-m-vertical_xxx-small" size="6">
+                  <lightning-button label="Campaigns(0)" data-id="campaigns" title="Campaigns" onclick={handleCampaign} icon-name="utility:add" style="display: grid; width: 100%">
+                  </lightning-button>
+             </lightning-layout-item>
+                     <lightning-layout-item class="slds-m-vertical_xxx-small" size="6">
+                  <lightning-button label="Physicians" title="Physicians" data-id="physicians" onclick={handlePhysician} icon-name="utility:add" style="display: grid; width: 100%">
+                  </lightning-button>
+             </lightning-layout-item>
+              <lightning-layout-item class="slds-m-vertical_xxx-small" size="6">
+                  <lightning-button label="Outbound Referrals Practice" data-id="outboundReferralsPrac" title="Outbound Referrals Practice" icon-name="utility:add" onclick={handleOutboundReferralPractice} style="display: grid; width: 100%">
+                  </lightning-button>
+             </lightning-layout-item>
+
+                         <lightning-layout-item class="slds-m-vertical_xxx-small" size="6">
+                  <lightning-button label="Pharmacies" title="Pharmacies" data-id="memberPharmacy" icon-name="utility:add" onclick={handlePharmacyClick} style="display: grid; width: 100%">
+                  </lightning-button>
+             </lightning-layout-item>
+             <lightning-layout-item class="slds-m-vertical_xxx-small" size="6">
+               <lightning-button label="Outbound Referrals Organization" data-id="outboundReferralsOrg" title="Outbound Referrals Organization" icon-name="utility:add" onclick={handleOutboundReferralOrg} style="display: grid; width: 100%">
+               </lightning-button>
+          </lightning-layout-item>
+          <lightning-layout-item class="slds-m-vertical_xxx-small" size="6">
+               <lightning-button label="Member's Events" data-id="MemberEvents" title="Member's Events" icon-name="utility:add" onclick={handleMemberEvents} style="display: grid; width: 100%">
+               </lightning-button>
+          </lightning-layout-item>
+              <lightning-layout-item class="slds-m-vertical_xxx-small" size="6">
+                
+             </lightning-layout-item>
+            
+         </lightning-layout>
+               </lightning-card>
+</lightning-accordion-section>
+
+</lightning-accordion>
+
+      
+<!--<c-create-New-Plan-Quick onsaving={refreshComponent} if:true={showCreatePlan} parent-account-id={recordId} onclose={closeModal}></c-create-New-Plan-Quick>-->
+<c-custom-related-list-cmp onsaving={refreshComponent}
+                           if:true={showCreatePlan}
+                           parent-account-id={recordId}
+                           onclose={closeModal}
+                           table-columns={memberPlanColumns}
+                           field-list={memberPlanFieldList}
+                           table-data={recordLst}
+                           object-api-name = "MemberPlanDetail__c"
+                           title-name="Member Plan's List"
+                           form-name="New Member's plan"
+                           ></c-custom-related-list-cmp>
+
+<c-custom-related-list-cmp onsaving={refreshComponent}
+                           if:true={showCareGiver}
+                           parent-account-id={recordId}
+                           onclose={closeModal}
+                           table-columns={caregiverColumns}
+                           field-list={careGiverFieldList}
+                           object-api-name = "CaregiverContact__c"
+                           title-name="Caregiver's List"
+                           form-name="New Caregiver"
+                           table-data={recordLst}
+                           ></c-custom-related-list-cmp>
+
+<c-custom-related-list-cmp onsaving={refreshComponent}
+                           if:true={showMemberPractice}
+                           parent-account-id={recordId}
+                           onclose={closeModal}
+                           table-columns={memberColumns}
+                           field-list={memberPracticeFieldList}
+                           object-api-name = "Member_practices__c"
+                           title-name="Member's practices"
+                           form-name="New Member's practice"
+                           table-data={recordLst}
+                           ></c-custom-related-list-cmp>
+
+<c-custom-related-list-cmp onsaving={refreshComponent}
+                           if:true={showMemberMedication}
+                           parent-account-id={recordId}
+                           onclose={closeModal}
+                           table-columns={memberMedicationColumns}
+                           field-list={memberMedicationFieldLst}
+                           object-api-name = "MemberMedication__c"
+                           title-name="Member's Medications"
+                           form-name="New Member Medication"
+                           table-data={recordLst}
+                           ></c-custom-related-list-cmp>
+
+<c-custom-related-list-cmp onsaving={refreshComponent}
+                           if:true={showMemberCampaign}
+                           parent-account-id={recordId}
+                           onclose={closeModal}
+                           table-columns={memberCampaignColumns}
+                           field-list={memberCampaignFieldLst}
+                           object-api-name = "Member_campaigns__c"
+                           title-name="Member's Campaign"
+                           form-name="New Member's Campaign"
+                           table-data={recordLst}
+                           ></c-custom-related-list-cmp>
+
+
+<c-custom-related-list-cmp onsaving={refreshComponent}
+                         if:true={showMemberHospital}
+                         parent-account-id={recordId}
+                         onclose={closeModal}
+                         table-columns={memberHospitalColumns}
+                         field-list={memberHospitalFieldLst}
+                         object-api-name = "Member_s_hospitals__c"
+                         title-name="Member's hospitals"
+                         form-name="New Member's hospital"
+                         table-data={recordLst}
+                         ></c-custom-related-list-cmp>
+
+
+<c-custom-related-list-cmp onsaving={refreshComponent}
+                         if:true={showMemberPhysician}
+                         parent-account-id={recordId}
+                         onclose={closeModal}
+                         table-columns={memberPhysicianColumns}
+                         field-list={memberPhysicianFieldLst}
+                         object-api-name = "Member_s_physician__c"
+                         title-name="Member's Physicians"
+                         form-name="New Member's Physician"
+                         table-data={recordLst}
+                         ></c-custom-related-list-cmp>
+
+
+  <c-custom-related-list-cmp onsaving={refreshComponent}
+                         if:true={showOutboundReferralPractice}
+                         parent-account-id={recordId}
+                         onclose={closeModal}
+                         table-columns={memberOutboundReferralPracticeColumns}
+                         field-list={memberOutboundReferralPracticeFields}
+                         object-api-name = "Outbound_Referral_Practice__c"
+                         title-name="Outbound Referral Practices"
+                         form-name="New Outbound Referral Practices"
+                         table-data={recordLst}
+                         ></c-custom-related-list-cmp>
+
+ <c-custom-related-list-cmp onsaving={refreshComponent}
+                         if:true={showOutboundReferralOrg}
+                         parent-account-id={recordId}
+                         onclose={closeModal}
+                         table-columns={memberOutboundReferralOrgColumns}
+                         field-list={memberOutboundReferralOrgFields}
+                         object-api-name = "Outbound_Referral_Organization__c"
+                         title-name="Outbound Referral Organization"
+                         form-name="New Outbound Referral Organization"
+                         table-data={recordLst}
+                         ></c-custom-related-list-cmp>
+
+
+<c-custom-related-list-cmp onsaving={refreshComponent}
+                         if:true={showMembersEvent}
+                         parent-account-id={recordId}
+                         onclose={closeModal}
+                         table-columns={memberEventColumns}
+                         field-list={memberEventFieldList}
+                         object-api-name = "Members_at_event__c"
+                         title-name="Member's Event"
+                         form-name="Member's Event"
+                         table-data={recordLst}
+                         ></c-custom-related-list-cmp>
+
+ <c-custom-related-list-cmp onsaving={refreshComponent}
+                         if:true={showPharmacy}
+                         parent-account-id={recordId}
+                         onclose={closeModal}
+                         table-columns={memberPharmacyColumns}
+                         field-list={memberPharmacyFieldList}
+                         object-api-name = "Member_s_pharmacy__c"
+                         title-name="Member's Pharmacies"
+                         form-name="Member's Pharmacies"
+                         table-data={recordLst}
+                         ></c-custom-related-list-cmp>
+
+                         
+</lightning-card>
+</template>

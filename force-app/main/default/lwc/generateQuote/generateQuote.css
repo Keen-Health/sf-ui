@@ -1,0 +1,48 @@
+.slds-modal__container {
+    width: 80%;
+    max-width: 100rem;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+} 
+/* .radio-combo-inline .slds-form-element__control .slds-radio {
+    display: inline-flex !important;
+}
+
+.radio-combo-inline .slds-form-element__control {
+    display: inline-flex !important;
+} */
+
+/* .slds-form-element__control .slds-radio{
+    display:inline;
+    } */
+
+.label-question {
+    font-weight: bold;
+    font-size: 14px;
+}
+.input-priority {
+    width: 20px;
+    height: 1.5rem;   
+    padding-left: 0.25rem;
+}
+.checkbox-container{
+    height: 2rem;
+    display: flex;
+    align-items: center;
+}
+.input-small {
+    width: 5rem !important;
+}
+
+.input-large {
+    width: 20rem !important;
+}
+
+/* fieldset {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+} */
+.box-shadow{
+    box-shadow: var(--lwc-shadowDropDown);
+   
+}

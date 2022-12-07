@@ -1,0 +1,49 @@
+<template >
+    <!-- Modal/Popup Box LWC starts here -->
+    <lightning-record-edit-form record-id={getIdFromParent} object-api-name={objectApiName} onsuccess={handleSuccess} onsubmit={submitPhoneDetail} >
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container" style="width:20% important!">
+            <!-- Modal/Popup Box LWC header here -->
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleClose}>
+                    <lightning-icon icon-name="utility:close"
+                        alternative-text="close"
+                        variant="inverse"
+                        size="small" ></lightning-icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Source Type and Source Name the member came from.</h2>
+            </header>
+            <!-- Modal/Popup Box LWC body starts here -->
+            <div class="slds-modal__content slds-p-around_medium" style="overflow: initial;" id="modal-content-id-1">
+
+                            <lightning-input-field disabled={readOnly}  if:true = {showCommunityLookup} data-id="Source_Community_organization__c" field-name="Source_Community_organization__c" variant="label-stacked" >
+                            </lightning-input-field>
+                            <lightning-input-field disabled={readOnly} if:true = {showPracticeDirectoryLookup} data-id="Practice_directory__c" field-name="Practice_directory__c" variant="label-stacked" >
+                            </lightning-input-field>
+                            <lightning-input-field disabled={readOnly} if:true = {showReferringMemberLookup} data-id="Source_Referring_member__c" field-name="Source_Referring_member__c" variant="label-stacked" >
+                            </lightning-input-field>
+                            <lightning-input-field disabled={readOnly} if:true = {showReferringMemberLookup} data-id="Referring_member_s_relationship__c" field-name="Referring_member_s_relationship__c" variant="label-stacked" >
+                            </lightning-input-field>
+                            <lightning-input-field disabled={readOnly} if:true = {showEventLookup} data-id="Ev" field-name="Event__c" variant="label-stacked" >
+                            </lightning-input-field>
+                            <lightning-input-field disabled={readOnly} if:true = {showCampaignLookup} data-id="Source_Campaigns__c" field-name="Source_Campaigns__c" variant="label-stacked" >
+                            </lightning-input-field>
+
+
+                            
+
+            </div>
+            <!-- Modal/Popup Box LWC footer starts here -->
+            <footer class="slds-modal__footer">
+                <template if:false={readOnly}>
+                <button class="slds-button slds-button_neutral" onclick={handleClose} title="Cancel">Cancel</button>
+                <lightning-button type="submit" data-name="Submitbtn" name="submit" label="Ok">
+                </lightning-button>
+                </template>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</lightning-record-edit-form>
+</template>

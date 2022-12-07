@@ -1,0 +1,51 @@
+<template>
+    <lightning-record-edit-form record-id={recordId} object-api-name={objectApiName} onsuccess={handleSuccess}
+        onerror={handleError}>
+        <lightning-card title="Personalized Messages" icon-name="standard:person_account">
+            <div slot="actions" class="slds-clearfix">
+                <div class="slds-float_right" if:false={showEditField}>
+                    <lightning-button label="Edit" onclick={handleEdit}>
+                    </lightning-button>
+                </div>
+                <div if:true={showEditField} class="slds-float_right">
+                    <lightning-button type="submit" variant="brand" name="submit" label="Save">
+                    </lightning-button>
+                    <lightning-button class="slds-p-left_small" label="Cancel" onclick={onClickCancel}>
+                    </lightning-button>
+                </div>
+            </div>
+            <div class="slds-grid slds-grid_vertical" if:false={showEditField}>
+                <div class="slds-col slds-p-around_small">
+                    <label class="label-style">
+                        Birthday Message:
+                    </label>
+                    <lightning-output-field variant="label-hidden" field-name="Birthday_Message__c">
+                    </lightning-output-field>
+                </div>
+                <div class="slds-col slds-p-around_small">
+                    <label class="label-style">
+                        Anniversary Message:
+                    </label>
+                    <lightning-output-field variant="label-hidden" field-name="Anniversary_Message__c">
+                    </lightning-output-field>
+                </div>
+            </div>
+            <div class="slds-grid slds-grid_vertical" if:true={showEditField}>
+                <div class="slds-col slds-p-around_small">
+                    <!-- <label class="label-style">
+                        Birthday Message:
+                    </label> -->
+                    <lightning-input-field variant="label-hidden" field-name="Birthday_Message__c">
+                    </lightning-input-field>
+                </div>
+                <div class="slds-col slds-p-around_small">
+                    <!-- <label class="label-style">
+                        Anniversary Message:
+                    </label> -->
+                    <lightning-input-field variant="label-hidden" field-name="Anniversary_Message__c">
+                    </lightning-input-field>
+                </div>
+            </div>
+        </lightning-card>
+    </lightning-record-edit-form>
+</template>

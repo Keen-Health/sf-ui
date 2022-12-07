@@ -1,0 +1,33 @@
+<template>
+    <lightning-card title="Generate Permission to Contact Form">
+    
+        <lightning-layout>
+            <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="3">
+                <div class="slds-col slds-size_6-of-6">Add Event Name</div>    
+            </lightning-layout-item> 
+            <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="9">
+                <div class="slds-text-heading_small"><c-custom-look-up obj-name="Event__c" search-placeholder="Search Keen Events" icon-name="standard:account" 
+                    onlookupselected={handleEventSelection}> </c-custom-look-up>
+                </div>    
+            </lightning-layout-item> 
+        </lightning-layout>    
+        <lightning-layout>
+
+            <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="3">
+                <div class="slds-col slds-size_6-of-6">Add Advisor Information</div>    
+            </lightning-layout-item> 
+            <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="9">
+                <div class="slds-text-heading_small"><c-custom-look-up obj-name="User" search-placeholder="Search Users" icon-name="standard:account" 
+                    onlookupselected={handleUserSelection}> </c-custom-look-up>
+                </div>    
+            </lightning-layout-item> 
+        </lightning-layout>
+        
+        
+        <div class="slds-align_absolute-center" style="height:5rem">
+            <lightning-button class="slds-m-left_x-small" label="Navigate to PTC Form" variant="brand" 
+            onclick={handleNavigate}></lightning-button>
+        </div>
+    </lightning-card>
+
+</template>
