@@ -1,0 +1,292 @@
+<template >
+    <template if:false={areDetailsVisible}>
+        <div class="slds-spinner_container slds-scrollable">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--small slds-is-relative" role="alert">
+              <span class="slds-assistive-text">Loading...</span>
+              <div class="slds-spinner__dot-a"></div>
+              <div class="slds-spinner__dot-b"></div>
+            </div>
+          </div>
+          </template>
+   
+        <div class="slds-theme_default"  style="padding-bottom:50px">
+
+
+<lightning-record-edit-form object-api-name="Account" record-type-id="0128c000001Rdf3" onsuccess={handleSuccess} onload={handleLoad} onsubmit={handleSubmit}  >  
+<lightning-card title="New Keen Lead and Member" icon-name="standard:account">
+    <div slot="actions"  class="slds-clearfix">
+        <div class="slds-float_right">
+            <lightning-button type="submit" data-name="Submitbtn" name="submit" class="slds-m-around_xx-small" variant="brand" label="Save">
+            </lightning-button>
+            <lightning-button  label="Cancel" class="slds-m-around_xx-small" type="cancel" onclick={handleCancel}></lightning-button>
+        
+        </div>
+      </div>
+
+    <div class="slds-m-around_medium"> 
+  
+
+            <div class="slds-grid slds-gutters slds-wrap">
+                <div class="slds-col slds-size_3-of-12">
+                    <span >
+                            <label class="slds-form-element__label">
+                            First Name:
+                        </label>
+                    <lightning-input-field field-name="FirstName" variant="label-Hidden" > </lightning-input-field>
+                </span>
+                </div>
+                <div class="slds-col slds-size_3-of-12">
+                    <span >
+                            <label class="slds-form-element__label">
+                            Middle Name:
+                        </label>
+                    <lightning-input-field  field-name="MiddleName" variant="label-Hidden" > </lightning-input-field>
+                </span>
+                </div>
+                <div class="slds-col slds-size_2-of-12">
+                    <span >
+                            <label class="slds-form-element__label">
+                                <span title="required" class="slds-required">*</span>Last Name:
+                        </label>
+                    <lightning-input-field field-name="LastName" variant="label-Hidden" > </lightning-input-field>
+                </span>
+                </div>
+                
+                <div class="slds-col slds-size_2-of-12"></div>
+                <div class="slds-col slds-size_2-of-12"></div>
+
+
+
+                <div class="slds-col slds-size_3-of-12">
+                    <span >
+                            <label class="slds-form-element__label">
+                            DoB:
+                        </label>
+                    <lightning-input-field field-name="DoB__c" variant="label-Hidden" > </lightning-input-field>
+                </span>
+                </div>
+                <div class="slds-col slds-size_3-of-12">
+                    <span >
+                        <label class="slds-form-element__label" style="cursor: pointer;">
+                            Source:
+                            <lightning-icon class="slds-m-left_small" onclick={handleSourceClick} size="x-small" icon-name="utility:chevrondown" alternative-text="source detail" title="source detail"></lightning-icon>
+                        </label>
+                    <lightning-input-field field-name="AccountSource" data-id="source" onchange={handleSourceChange} variant="label-hidden" > </lightning-input-field>
+                </span>
+                </div>
+
+                <div class="slds-col slds-size_2-of-12">
+                    <span >
+                            <label class="slds-form-element__label">
+                            Email:
+                        </label>
+                        <lightning-input-field data-id="emailAddress" field-name="PersonEmail" variant="label-hidden" > </lightning-input-field>
+                </span>
+                </div>
+                <div class="slds-col slds-size_2-of-12">
+                    <span>
+                        <label class="slds-form-element__label" style="cursor: pointer;" onclick={handlePTCClick}>
+                            PTC:
+                            <lightning-icon class="slds-m-left_small" onclick={handlePTCClick} size="x-small" icon-name="utility:chevrondown" alternative-text="ptc detail" title="ptc detail"></lightning-icon>
+                        </label>
+                        <lightning-input-field class="slds-form-element__control" field-name="Permission_to_contact_date__c" variant="label-hidden"  > </lightning-input-field>
+                    </span>
+                </div>
+
+                <div class="slds-col slds-size_2-of-12">
+                    <span>
+                        <label class="slds-form-element__label" style="cursor: pointer;">
+                            SOA:
+                        </label>
+                    <lightning-input-field data-id="scopeOfAppointment" field-name="Scope_of_appointment_date__c" variant="label-hidden" > </lightning-input-field>
+                </span>
+                </div>
+
+
+
+
+
+                <div class="slds-col slds-size_3-of-12">
+                    <span >
+                        <label class="slds-form-element__label" style="cursor: pointer;" onclick={handleOtherDetailClick}>
+                            Gender and other demographics:
+                            <lightning-icon class="slds-m-left_small" onclick={handleOtherDetailClick} size="x-small" icon-name="utility:chevrondown" alternative-text="medicare detail" title="medicare detail"></lightning-icon>
+                        </label>
+                    <lightning-input-field field-name="GenderIdentity__c" variant="label-hidden" > </lightning-input-field>
+                </span>
+                </div>
+                <div class="slds-col slds-size_3-of-12">
+                    <span>
+                            <label class="slds-form-element__label">
+                            Status:
+                        </label>
+                        <lightning-input-field data-id="status" field-name="Status__c" onchange={handleStatusClick} variant="label-hidden" > </lightning-input-field>
+                </span>
+                </div>
+                <div class="slds-col slds-size_2-of-12">
+                    <span >
+                        <label class="slds-form-element__label" style="cursor: pointer;" onclick={handlePhoneClick}>
+                            Phone:
+                            <lightning-icon class="slds-m-left_small" onclick={handlePhoneClick} size="x-small" icon-name="utility:chevrondown" alternative-text="phone detail" title="phone detail"></lightning-icon>
+                        </label>
+                  
+                    <lightning-input-field class="slds-form-element__control primaryPhone" data-id="phn" onchange={changePhoneNumber} field-name="Phone" variant="label-hidden" > </lightning-input-field>
+                </span>
+                </div>
+   
+                <div class="slds-col slds-size_2-of-12">
+                    <span>
+                        <label class="slds-form-element__label" style="cursor: pointer;">
+                            No Medication:
+                        </label>
+                    <lightning-input-field field-name="No_medication__c" variant="label-hidden" > </lightning-input-field>
+                </span>
+                </div>
+
+                <div class="slds-col slds-size_2-of-12">
+                    <span>
+                        <label class="slds-form-element__label">
+                            No Preferred Physician:
+                        </label>
+                    <lightning-input-field field-name="No_preferred_physicians__c" variant="label-hidden" > </lightning-input-field>
+                </span>
+                </div>
+
+
+               
+            
+                <div class="slds-col slds-size_3-of-12">
+                    <span >
+                        <label class="slds-form-element__label" style="cursor: pointer;">
+                           Street Address:
+                            <lightning-icon class="slds-m-left_small"  size="x-small" icon-name="utility:chevrondown" alternative-text="address detail" title="address detail"></lightning-icon>
+                        </label>
+
+                       <lightning-input-field 	class="slds-form-element__control" data-id="addressOutput" field-name="PersonMailingStreet" variant="label-hidden" > </lightning-input-field>
+                </span>
+                    
+                </div>
+        
+                <div class="slds-col slds-size_3-of-12">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="text-input-id-47">Account Owner:</label>
+                        <div class="slds-form-element__control">
+                            {accountOwner}
+                        </div>
+                      </div> 
+                </div>
+                <div class="slds-col slds-size_2-of-12">
+                    <span>
+                        <label class="slds-form-element__label">
+                            Do not Call:
+                        </label>
+                    <lightning-input-field field-name="Do_not_call__c" variant="label-hidden" > </lightning-input-field>
+                </span>
+                </div>
+                <div class="slds-col slds-size_2-of-12">
+              <!--      <span >
+                        <label class="slds-form-element__label" style="cursor: pointer;">
+                            Appointment Date and Time:
+                        </label>
+                    <lightning-input-field class="slds-form-element__control" variant="label-hidden" field-name="Appointment_Date_Time__c"  > </lightning-input-field>
+                </span> -->
+
+                <span >
+                    <label class="slds-form-element__label" style="cursor: pointer;" onclick={handleMedDetailClick}>
+                        Medicare Detail
+                        <lightning-icon class="slds-m-left_small" onclick={handleMedDetailClick} size="x-small" icon-name="utility:chevrondown" alternative-text="medicare detail" title="medicare detail"></lightning-icon>
+                    </label>
+                </span>
+
+                </div>
+                <div class="slds-col slds-size_2-of-12"></div>
+
+
+                   
+        
+                <div class="slds-col slds-size_6-of-12"></div>
+                <div class="slds-col slds-size_12-of-12">
+                    <span >
+               
+                    <lightning-input-field class="slds-form-element__control" variant="label-hidden" field-name="First_call_notes__c"  > </lightning-input-field>
+                </span>
+                </div>
+
+            </div>
+
+ 
+
+   
+</div>
+</lightning-card>
+</lightning-record-edit-form>
+
+   
+<c-Create-Account-Phone-Detail read-only={isDisabled} phone-detail={phoneDetail} onselection={getPhoneDataFromModal} onclose={closeModal} get-id-from-parent={recordId} primary-contact={primeContact} object-api-name={objectApiName} if:true={isModalOpen}></c-Create-Account-Phone-Detail>
+<c-Archive-Notes-Cmp archive-detail={archiveDetail} onselection={getArchiveDataFromModal} onclose={closeModal} get-id-from-parent={recordId} object-api-name={objectApiName} if:true={isArchiveModalOpen}></c-Archive-Notes-Cmp >     
+<c-Source-Detail-Cmp read-only={isDisabled} onclose={closeModal} source-detail={sourceDetail}  source-pick-value={sourcePickValue} onselection={getSourceDataFromModal} other-provider={sourceOtherProviders} get-id-from-parent={recordId} object-api-name={objectApiName} if:true={isSourceModalOpen}></c-Source-Detail-Cmp>
+<c-Permission-To-Contact-Info-Cmp read-only={isDisabled}  ptc-detail={ptcDetail} onselection={getPTCDataFromModal} onclose={closeModal} get-id-from-parent={recordId} object-api-name={objectApiName} if:true={isPTCModalOpen}></c-Permission-To-Contact-Info-Cmp>
+<c-Custom-Acc-Address-Cmp disabled={isDisabled} address-detail={addressDetail} onselection={getAddressdataFromModal} onclose={closeModal} get-id-from-parent={recordId} object-api-name={objectApiName} if:true={isAddressModalOpen}></c-Custom-Acc-Address-Cmp>
+<c-Medicare-Detail-Cmp read-only={isDisabled} med-detail={medDetail} onselection={getMeddataFromModal} onclose={closeModal} get-id-from-parent={recordId} object-api-name={objectApiName} if:true={isMedModalOpen}></c-Medicare-Detail-Cmp>
+<c-Other-Info read-only={isDisabled} other-detail={otherDetail} onselection={getOtherDataFromModal} onclose={closeModal} get-id-from-parent={recordId} object-api-name={objectApiName} if:true={isOtherModalOpen}></c-Other-Info>
+
+
+</div>
+<template if:true={showValidationModal}>
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+       <div class="slds-modal__container">
+        <!-- modal header start -->
+          <header class="slds-modal__header">
+             <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{validationModalData.title}</h2>
+          </header>
+          <!-- modal body start -->
+          <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+            <template for:each={validationModalData.body} for:item="message">
+                <div key={message.id} if:true={message.show} class="slds-p-top_small">
+                    <label>
+                        <lightning-icon class="slds-m-right_small" size="xx-small" icon-name="utility:right"></lightning-icon>
+                        {message.text}
+                    </label>
+                </div>
+             </template> 
+          </div>
+          <!-- modal footer start-->
+          <footer class="slds-modal__footer">
+            <template for:each={validationModalData.buttons} for:item="button">
+                    <lightning-button label={button.label}  key={button.id} variant={button.variant} class="slds-m-left_small" onclick={button.callBack}></lightning-button>          
+             </template> 
+          </footer>
+       </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!--Use template if:true to display/hide popup based on isModalOpen value-->
+<template if:true={isShowModal}>
+    <!-- Modal/Popup Box LWC starts here -->
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <!-- Modal/Popup Box LWC body starts here -->
+            <div class="slds-modal__content slds-p-around_small" id="modal-content-id-1" style="background-color:#f3f3f3">
+                <p>The record you are about to create is potential duplicate of the below 
+                    existing record(s). Please review before creating the new record.
+                </p>
+            </div>
+            <!-- <div if:true={data} class="slds-modal__content slds-p-left_medium slds-p-right_medium slds-p-bottom_medium slds-grid slds-wrap"> -->
+                <lightning-datatable class="slds-max-medium-table_stacked-horizontal" 
+                    key-field="Id" 
+                    data={data} 
+                    hide-checkbox-column="true" 
+                    columns={columns}>
+                </lightning-datatable>
+            <!-- </div> -->
+            <!-- Modal/Popup Box LWC footer starts here -->
+            <footer class="slds-modal__footer" style="text-align: center">
+                <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">Cancel</button>
+                <button class="slds-button slds-button_brand" onclick={submitDetails} title="OK">Create Record</button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+</template>

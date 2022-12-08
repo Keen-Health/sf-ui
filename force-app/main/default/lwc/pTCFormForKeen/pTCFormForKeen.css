@@ -1,0 +1,19 @@
+.checkboxClass1 .slds-form-element__control{
+    display: -webkit-box;
+    display: flex;
+}
+.myColor.THIS  {
+    background-color: hsl(180, 19%, 80%);
+}
+
+:host{
+    --lwc-inputStaticFontSize: 30px;
+    --lwc-inputStaticFontWeight: bold;
+ }
+
+ .THIS .slds-form-element__label {
+    font-size: 60px;
+}
+.newLabel{
+    font-size: 17px;
+}

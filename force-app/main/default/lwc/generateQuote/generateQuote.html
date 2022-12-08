@@ -1,0 +1,459 @@
+<template>
+    <lightning-layout class="slds-grid slds-grid_align-end">    
+        <lightning-layout-item if:true={isAurthForGenerateQuote} class="slds-col" >   
+            <!-- @TODO: Once we come to know from Lavanya, how to enable/disable respective field in SF, we must add below condition above -->
+            <!-- if:true={isAurthForGenerateQuote} -->
+            <!-- lightning button for open modal window -->
+            <lightning-button
+                variant="brand"
+                label="Generate Quote"
+                title="Generate Quote"
+                onclick={getMemberInfo}
+                class="slds-m-left_x-small generate-quote-button"
+                disabled={isGenerateQuoteBtnDisabled}
+                >    
+                <!-- @TODO: this is commented for testing realted lists, once it's done, add this below condition into above. -->
+                <!-- disabled={isGenerateQuoteBtnDisabled} -->
+            </lightning-button>
+            <lightning-helptext if:true={isGenerateQuoteBtnDisabled} 
+                content={GenerateQuoteBtnHelptext}></lightning-helptext>
+            <p if:true={isgenerateQuoteTimerEnabled} 
+                class="slds-m-top_x-small slds-m-horizontal_x-small slds-text-body_regular">Please wait for {generateQuoteTimeCount.min}:{generateQuoteTimeCount.sec}min
+            </p>
+        </lightning-layout-item>
+   
+    </lightning-layout>
+    <!--Use template if:true to display/hide popup based on isModalOpen value--> 
+    <template if:true={isModalOpen}>
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" 
+            class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Generate Quotation</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-scrollable_y slds-p-around_large" id="modal-content-id-1">
+                    <lightning-card class="slds-grid slds-wrap slds-box slds-box_small box-shadow">
+                        <label class="label-question">Contact Info</label>
+                        <lightning-layout multiple-rows>
+                            <lightning-layout-item  padding="around-small" size="12" small-device-size="12" medium-device-size="3">
+                                <lightning-input label="First Name" required class="fieldvalidate" name="firstName" value={member.firstName}
+                                onchange={changeHandler}>
+                                </lightning-input>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="3">
+                                <lightning-input class="fieldvalidate" required label="Last Name" name="lastName" value={member.lastName}
+                                onchange={changeHandler}>
+                                </lightning-input>
+                            </lightning-layout-item>  
+                            <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="2">
+                                <lightning-input label="Date of Birth" required class="fieldvalidate" type="date" date-style="short" name="dob" value={member.dob}
+                                onchange={dobChangeHandler}></lightning-input>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="2">
+                                <lightning-input label="Zip Code" required class="fieldvalidate" type="tel" pattern="[0-9]{5}$" max-length="5" 
+                                    message-when-pattern-mismatch="Please enter a valid zip code" name="shippingPostalCode" value={member.shippingPostalCode}
+                                    onchange={changeHandler}></lightning-input>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="2">
+                                <lightning-input label="County" required class="fieldvalidate" maxlength="25" type="text" name="county" value={member.county}
+                                onchange={changeHandler}></lightning-input>
+                            </lightning-layout-item>          
+                        </lightning-layout>
+            
+                        <lightning-layout multiple-rows>
+                            <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="3">
+                                <lightning-input label="Email" name="email" required={isEmailRequired} type="email" value={member.email} class="fieldvalidate"
+                                onchange={changeHandler}></lightning-input>
+                            </lightning-layout-item> 
+                            <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="3">
+                                <lightning-input label="Phone Number" class="fieldvalidate" required={isPhoneRequired} type="tel" pattern="[0-9]{10}$" max-length="10" 
+                                    message-when-pattern-mismatch="Please enter a valid phone number" name="phone" value={member.phone}
+                                    onchange={changeHandler}></lightning-input>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="6">
+                                <lightning-radio-group name="primaryContact"
+                                    class="radio-combo-inline"
+                                    label="Primary Contact"
+                                    options={contactOptions}
+                                    value={member.primaryContact}
+                                    onchange={handleChangeForPrimaryContact}
+                                    variant = "label-stacked">
+                                </lightning-radio-group> 
+                            </lightning-layout-item>
+                        </lightning-layout>
+                        <p class="slds-required slds-size_4-of-4" if:true={validationErrors.primaryContact}>{primaryContactErrMsg} is mandatory for the selected method of contact.</p>
+                    </lightning-card>
+                    
+
+                    <lightning-layout-item class="slds-grid slds-wrap slds-box slds-box_small box-shadow slds-m-top_x-small">
+                        <label class="slds-col slds-size_1-of-1 label-question">
+                            Please select the plan types to discuss with consumer</label>
+                        <lightning-checkbox-group name="planTypes"
+                            class="checkboxClass fieldvalidate slds-p-top_small"
+                            required
+                            variant="label-hidden"
+                            options={planConsumerTypeOptions}
+                            value={member.planTypes}
+                            onchange={handleChangeforConsumerPlanType}>
+                        </lightning-checkbox-group> 
+                    </lightning-layout-item>
+
+                    <lightning-layout-item class="slds-grid slds-box slds-box_small box-shadow slds-m-top_x-small">
+                            <label class="label-question slds-p-top_x-small slds-p-right_small">Plan Year</label>
+                        <lightning-combobox
+                            name="planYear" class="input-small"
+                            value={member.planYear}
+                            placeholder="Select"
+                            options={planYearOptions}
+                            onchange={changeHandler}
+                            variant="label-hidden">
+                        </lightning-combobox>    
+                    </lightning-layout-item>
+
+                    <div if:true={isPharmacyFieldVisible} class="slds-box slds-box_small box-shadow slds-grid slds-box slds-wrap slds-m-top_x-small">
+                        <label class="label-question slds-p-top_small slds-p-right_small">Do you want to add a preferred pharmacy?</label>
+                        <lightning-layout-item>
+                            <lightning-radio-group name="isPharmaciesRequired"
+                                class="checkboxClass"
+                                type="button"
+                                options={yesOrNoOptions}
+                                value={member.isPharmaciesRequired}
+                                onchange={handleChangeforRelatedListRequired}>
+                            </lightning-radio-group>
+                        </lightning-layout-item>
+                        <div if:true={member.isPharmaciesRequired_flag} class="slds-p-vertical_xx-small slds-col_bump-left">
+                            <lightning-button data-name="NewBtn" 
+                                name="New"
+                                onclick={showPharmaciesForm} label="New">
+                            </lightning-button> 
+                        </div>
+                        <div if:true={member.isPharmaciesRequired_flag} class="slds-grid slds-wrap slds-size_4-of-4">
+                            <lightning-card class="slds-size_4-of-4">
+                                <div if:true={isPharmaciesAvailable} class="slds-modal__content slds-grid slds-wrap slds-p-bottom_medium">
+                                    <lightning-datatable class="slds-max-medium-table_stacked-horizontal" 
+                                        key-field="Id" data={member.pharmacies} 
+                                        hide-checkbox-column="true" 
+                                        columns={pharmaciesTableColumns}>
+                                    </lightning-datatable>
+                                </div>
+                            </lightning-card>
+                            <lightning-card if:false={isPharmaciesAvailable} class="slds-p-bottom_medium slds-align_absolute-center slds-size_4-of-4">
+                                <div>No pharmacies added.</div>
+                            </lightning-card>
+                        </div>
+                        <p class="slds-required slds-size_4-of-4" if:true={validationErrors.mediPharm}>Please select at least one pharmacy*</p>
+                        <p class="slds-required slds-size_4-of-4" if:true={validationErrors.pharmacies}>Please select at least one pharmacy or select 'No Pharmacy' for the member.</p>
+                    </div>
+
+                    <div if:true={isMedicationsFieldVisible} class="slds-box slds-box_small box-shadow slds-grid slds-box slds-wrap slds-m-top_x-small">
+                        <label class="label-question slds-p-top_small slds-p-right_small">Do you want to add a prescription medication?</label>
+                        <lightning-layout-item>
+                            <lightning-radio-group name="isMedicationsRequired"
+                                class="checkboxClass"
+                                type="button"
+                                options={yesOrNoOptions}
+                                value={member.isMedicationsRequired}
+                                onchange={handleChangeforRelatedListRequired}>
+                            </lightning-radio-group>
+                        </lightning-layout-item>
+                        <div if:true={member.isMedicationsRequired_flag} class="slds-p-vertical_xx-small slds-col_bump-left">
+                            <lightning-button data-name="NewBtn" 
+                                name="New"
+                                onclick={showMedicationsForm} label="New">
+                            </lightning-button> 
+                        </div>
+                        <div if:true={member.isMedicationsRequired_flag} class="slds-grid slds-wrap slds-size_4-of-4">
+                            <lightning-card class="slds-size_4-of-4">
+                                <div if:true={isMedicationsAvailable} class="slds-modal__content slds-grid slds-wrap slds-p-bottom_medium">
+                                    <lightning-datatable class="slds-max-medium-table_stacked-horizontal" 
+                                        key-field="Id" data={member.medications} 
+                                        hide-checkbox-column="true" 
+                                        columns={medicationsTableColumns}>
+                                    </lightning-datatable>
+                                </div>
+                            </lightning-card>
+                            <lightning-card if:false={isMedicationsAvailable} class="slds-p-bottom_medium slds-align_absolute-center slds-size_4-of-4">
+                                <div>No medications added.</div>
+                            </lightning-card>
+                        </div>
+                        <p class="slds-required slds-size_4-of-4" if:true={validationErrors.medications}>Please select at least one medication or select 'No Medications' for the member.</p>
+                    </div>
+
+                    <div if:true={isDoctorsFieldVisible} class="slds-box slds-box_small box-shadow slds-grid slds-box slds-wrap slds-m-top_x-small">
+                        <label class="label-question slds-p-top_small slds-p-right_small">Do you want to add any doctors that you would like to be covered?</label>
+                        <lightning-layout-item>
+                            <lightning-radio-group name="isPhysiciansRequired"
+                                class="checkboxClass"
+                                type="button"
+                                options={yesOrNoOptions}
+                                value={member.isPhysiciansRequired}
+                                onchange={handleChangeforRelatedListRequired}>
+                            </lightning-radio-group>
+                        </lightning-layout-item>
+                        <div if:true={member.isPhysiciansRequired_flag} class="slds-p-vertical_xx-small slds-col_bump-left">
+                            <lightning-button data-name="NewBtn" 
+                                name="New"
+                                onclick={showPhysiciansForm} label="New">
+                            </lightning-button> 
+                        </div>
+                        <div if:true={member.isPhysiciansRequired_flag} class="slds-grid slds-wrap slds-size_4-of-4">
+                            <lightning-card class="slds-size_4-of-4">
+                                <div if:true={isPhysiciansAvailable} class="slds-modal__content slds-grid slds-wrap slds-p-bottom_medium">
+                                    <lightning-datatable class="slds-max-medium-table_stacked-horizontal" 
+                                        key-field="Id" data={member.physicians} 
+                                        hide-checkbox-column="true" 
+                                        columns={physiciansTableColumns}>
+                                    </lightning-datatable>
+                                </div>
+                            </lightning-card>
+                            <lightning-card if:false={isPhysiciansAvailable} class="slds-p-bottom_medium slds-align_absolute-center slds-size_4-of-4">
+                                <div>No physicians added.</div>
+                            </lightning-card>
+                        </div>
+                        <p class="slds-required slds-size_4-of-4" if:true={validationErrors.physicians}>	
+                            Please select at least one provideror select 'No Provider' for the member</p>
+                    </div>
+            
+                    <fieldset if:true={isEnrolledFieldVisible} class="slds-box slds-box_small box-shadow slds-form-element slds-m-top_x-small">
+                        <h2 class="label-question slds-p-bottom_small">
+                            Is the member currently enrolled in a Medicare Advantage or Prescription drug plan?</h2>
+
+                        <lightning-layout-item>
+                            <lightning-radio-group name="isEnrolled"
+                                class="checkboxClass"
+                                type="button"
+                                variant="label-hidden"
+                                options={yesOrNoOptions}
+                                value={member.isEnrolled}
+                                onchange={handleChangeforEnrolled}>
+                            </lightning-radio-group>
+                        </lightning-layout-item>
+                        <lightning-layout-item>
+                            <lightning-input if:true={isVisibleCurrentPlan} 
+                                label="Current Plan" class="slds-col slds-size_1-of-1 input-large" 
+                                name="currentPlan" 
+                                value={member.currentPlan}
+                                onchange={changeHandler}>
+                            </lightning-input>
+                        </lightning-layout-item>
+                        <lightning-layout-item>
+                            <lightning-radio-group if:true={isVisibleCurrentPlanType} name="currentPlanType"
+                                label="Current Plan Type"
+                                required class="fieldvalidate"
+                                type="button"
+                                options={planTypes}
+                                value={member.currentPlanType}
+                                onchange={changeHandler}>
+                            </lightning-radio-group> 
+                        </lightning-layout-item> 
+                    </fieldset>
+                    
+                    <fieldset if:true={isImpFieldVisible} class="slds-form-element box-shadow slds-box slds-box_small slds-m-top_x-small">
+                        <h2 class="slds-p-bottom_small label-question">What's most important to the patient? (Priority)</h2>
+                        <div class="slds-form-element__control">
+                            <div class="slds-checkbox">
+                                <template for:each={patientImportanceOptions} for:item="option">
+                                    <div class="rows checkbox-container" key={option.value}>
+                                        <input type="text" name={option.priority} 
+                                            disabled value={option.priority} 
+                                            if:true={option.isSelected} 
+                                            class="input-priority slds-m-right_xx-small" />
+                                        <label if:false={option.isSelected} class="input-priority slds-m-right_xx-small">&emsp;</label>
+                                        <input type="checkbox" id={option.value} 
+                                            name={option.label} value={option.value} 
+                                            checked={option.isSelected} 
+                                            onchange={handleChangeforPriority}/>
+                                        <label class="slds-checkbox__label" for={option.value}>
+                                            <span class="slds-checkbox_faux"></span>
+                                            <span class="slds-form-element__label">{option.label}</span>
+                                        </label>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </fieldset>
+                    
+                    <lightning-layout-item if:true={isSeeDoctorFieldVisible}>
+                        <div class="slds-box slds-box_small box-shadow slds-m-top_x-small">
+                            <h2 class="label-question slds-p-bottom_small">
+                                How often do you see a doctor or receive medical care in a year?</h2>
+                            <lightning-radio-group name="frequency"
+                                class="checkboxClass"
+                                type="button"
+                                variant="label-hidden"
+                                options={seeDoctorOptions}
+                                value={member.frequency}
+                                onchange={changeHandler}>
+                            </lightning-radio-group>
+                        </div>
+                    </lightning-layout-item> 
+
+                    <lightning-layout-item if:true={isSubsidyFieldVisible}>
+                        <div class="slds-box slds-box_small box-shadow slds-m-top_x-small">
+                            <h2 class="label-question slds-p-bottom_small">
+                                Do you receive Extra Help / Low Income Subsidy (optional)?</h2>
+                            <lightning-radio-group name="extraHelp"
+                                class="checkboxClass"
+                                type="button"
+                                variant="label-hidden"
+                                options={extraHelpOptions}
+                                value={member.extraHelp}
+                                onchange={handleChangeforExtraHelp}>
+                            </lightning-radio-group> 
+                            <div if:true={isDrugCoPayFieldVisible} >
+                                <h2 class="label-question slds-p-bottom_small">
+                                    Drug co-pay/co-insurance</h2>
+                                <lightning-radio-group name="drugCoPay"
+                                class="checkboxClass slds-m-top_x-small"
+                                type="button"
+                                variant="label-hidden"
+                                options={drugCoPayOptions}
+                                value={member.drugCoPay}
+                                onchange={handleChangeforDrugCoPay}>
+                            </lightning-radio-group> 
+                            </div>
+                             
+                            <div if:true={isMonthlyPlanPremiumFieldVisible} class="slds-col slds-size_1-of-1">
+                                <h2 class="label-question slds-p-bottom_small">
+                                    Monthly plan premium</h2>
+                            <lightning-radio-group if:true={isMonthlyPlanPremiumFieldVisible} name="monthlyPlanPremium"
+                                class="checkboxClass slds-m-top_x-small"
+                                type="button"
+                                variant="label-hidden"
+                                options={monthlyPlanPremiumsOptions}
+                                value={member.monthlyPlanPremium}
+                                onchange={changeHandler}>
+                            </lightning-radio-group> 
+                        </div>
+                <legend class="slds-form-element__label slds-m-top_x-small">Dual Eligibility plans will show the full premium unless an 'Extra Help / Low Income Subsidy' option is selected above</legend>
+                     </div>
+                    </lightning-layout-item>
+    
+                    <lightning-layout-item if:true={isIndemnityFieldVisible}>
+                        <div class="slds-box slds-box_small box-shadow slds-m-top_x-small">
+                            <h2 class="label-question slds-p-bottom_small">
+                                Do you want to add Hospital Indemnity or Medicare Supplement information?</h2>
+                            <lightning-radio-group name="indemnity"
+                            class="checkboxClass"
+                            type="button"
+                            variant="label-hidden"
+                            options={yesOrNoOptions}
+                            value={member.indemnity}
+                            onchange={handleChangeforIndemnity}>
+                        </lightning-radio-group> 
+                        
+                        <lightning-card if:true={isMedicareSupplement}>
+                            <hr class="slds-m-vertical_x-small">
+                            <label class="label-question">Customer details</label>
+                            <lightning-layout multiple-rows class="slds-p-left_small">
+                                <lightning-layout-item class="slds-grid slds-p-top_medium">
+                                    <label class="label-question slds-p-top_x-small slds-p-right_small">Effective Date</label>
+                                    <lightning-combobox
+                                        name="effectiveDate"
+                                        variant="label-hidden"
+                                        value={member.effectiveDate}
+                                        placeholder="Date"
+                                        options={effectiveDateOptions}
+                                        onchange={changeHandler}>
+                                    </lightning-combobox>
+                                </lightning-layout-item>
+                                <!-- <lightning-layout-item padding="around-small">
+                                    <lightning-input label="Date of Birth" class="" type="date" name="indemnityDob" value={member.indemnityDob}
+                                    onchange={handleChangeforIndemnityDob}></lightning-input>
+                                </lightning-layout-item> -->
+                            </lightning-layout>
+                            <div class="slds-p-top_medium slds-p-left_small">
+                                <div class="label-question  slds-m-bottom_small">Medicare Supplement</div>
+                                <label class="label-question">Part B Effective Date</label>
+                                <div>
+                                    <div class="slds-grid">
+                                        <lightning-layout-item class="label-question slds-p-bottom_small slds-p-right_small">
+                                        <lightning-combobox
+                                            name="partB_EffectiveMonth"
+                                            label="Month"
+                                            value={member.partB_EffectiveMonth}
+                                            placeholder="Month"
+                                            options={monthOptions}
+                                            onchange={changeHandler}>
+                                        </lightning-combobox>
+                                    </lightning-layout-item> 
+                                    
+                                        <lightning-layout-item class="label-question slds-p-bottom_small slds-p-right_small">
+                                        <lightning-combobox
+                                            name="partB_EffectiveYear"
+                                            label="Year"
+                                            value={member.partB_EffectiveYear}
+                                            placeholder="Year"
+                                            options={years}
+                                            onchange={changeHandler}>
+                                        </lightning-combobox>    
+                                    </lightning-layout-item> 
+                                    </div>
+                                    
+                                    <div class="slds-grid slds-wrap">
+                                    <lightning-layout-item class="slds-p-vertical_small slds-p-right_small">
+                                        <lightning-radio-group name="gender"
+                                            class="radio-combo-inline fieldvalidate"
+                                            type="button"
+                                            required
+                                            label="Gender"
+                                            options={genderOptions}
+                                            value={member.gender}
+                                            onchange={changeHandler}>
+                                        </lightning-radio-group> 
+                                    </lightning-layout-item>
+                                    
+                                    <lightning-layout-item class="slds-p-vertical_small slds-p-right_small">
+                                        <lightning-radio-group name="tobaccoUse"
+                                            class="radio-combo-inline"
+                                            type="button"
+                                            label="Tobacco use?"
+                                            options={yesOrNoOptions}
+                                            value={member.tobaccoUse}
+                                            onchange={changeHandler}>
+                                        </lightning-radio-group> 
+                                    </lightning-layout-item>
+                                    
+                                    <lightning-layout-item class="slds-p-vertical_small slds-p-right_small">
+                                        <lightning-radio-group name="householdDiscount"
+                                            class="radio-combo-inline"
+                                            type="button"
+                                            label="Household Discount"
+                                            options={yesOrNoOptions}
+                                            value={member.householdDiscount}
+                                            onchange={changeHandler}>
+                                        </lightning-radio-group> 
+                                    </lightning-layout-item>
+                                    </div>
+                                </div>
+                            </div>
+                        </lightning-card>
+                        </div>
+                    </lightning-layout-item>
+                </div>
+                
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">Cancel</button>
+                    <button class="slds-button slds-button_brand" onclick={submitDetails} title="Transfer to Sunfire">Transfer to Sunfire</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    <c-list-Messages-Modal-Cmp read-only={isDisabled}  list-messages-modal-data={listMessagesModalData} if:true={showListMessagesModal}></c-list-Messages-Modal-Cmp>
+    <!-- Testing purpose added... Will be removed later
+        <lightning-button onclick={handleConfirmClick} label="Open Confirm Modal">
+        </lightning-button> -->
+
+ </template>
