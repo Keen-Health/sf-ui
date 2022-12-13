@@ -360,7 +360,7 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
             this.validationErrors['mediPharm'] = true;
         }
 
-        if (this.getMemberData('pharmaciesForSF').length === 0 && this.member['isPharmaciesRequired'] === 'y') {
+        if (!this.validationErrors['mediPharm'] && this.getMemberData('pharmaciesForSF').length === 0 && this.member['isPharmaciesRequired'] === 'y') {
             isValid['pharmacies'] = false;
             this.validationErrors['pharmacies'] = true;
         }
@@ -400,7 +400,8 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
         if (validator) {
             this.saveDataToSF();
         } else if (!isValid.fieldValid) {
-            this.showErrorToast('Please fill out all required fields indicated with an *.');
+            //this.showErrorToast('Please fill out all required fields indicated with an *.');
+            this.showErrorToast('Please fix the error(s) before initiating the data transfer to Sunfire.');
         }
     }
 
