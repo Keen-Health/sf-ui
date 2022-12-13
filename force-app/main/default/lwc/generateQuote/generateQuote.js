@@ -240,11 +240,11 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
                     this.GenerateQuoteBtnHelptext = null;
                 } else if (status == 200) { //Tooltip: Quote generated successfully on <date time>  
                     let dt = result.data[0]['Sunfire_Response_Date__c'];
-                    // this.isGenerateQuoteBtnDisabled = true;
+                    this.isGenerateQuoteBtnDisabled = false;
                     this.GenerateQuoteBtnHelptext = 'Quote generated successfully on ' + this.getFormattedDate(dt.toString()) + '.';
                 }
                 else if (status == 100) {  //Tooltip: Data entry to Sunfire is in progress. Please wait.
-                    this.isGenerateQuoteBtnDisabled = true;
+                    this.isGenerateQuoteBtnDisabled = false;
                     this.GenerateQuoteBtnHelptext = 'Data entry to Sunfire is in progress. Please wait.';
                 }
             }
@@ -477,7 +477,7 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
                 if (statusCode == 200) {
                     const bodyData = response[0]['Sunfire_Response__c'];
                     // this.showSuccessToast('Quote generated successfully!');
-                    // this.isGenerateQuoteBtnDisabled = true;
+                    this.isGenerateQuoteBtnDisabled = false;
                     this.GenerateQuoteBtnHelptext = 'Quote generated successfully on ' + this.getFormattedDate(new Date().toString());
                     this.showSucessResponseModal(bodyData);
                 } else if (statusCode == 405) {
@@ -534,8 +534,8 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
         //this.userEmail,   @TODO: hardcoded email id as per Sunil request
         let reqObj = {
             "advisor_credentials": {
-                "advisor_email_id": this.userEmail,  
-                "record_id": this.getMemberData('id')
+                "advisor_email_id": 'desiree.brown@choosekeen.com',  
+                "record_id": '0017700000AQZZXAA5'
             },
             "contact_details": {
                 "salutation": this.getMemberData('salutation'),

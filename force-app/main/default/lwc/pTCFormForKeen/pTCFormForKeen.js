@@ -1,7 +1,7 @@
 import { LightningElement,track, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
-//import KEEN_LOGO from '@salesforce/contentAssetUrl/unknown_content_asset';
+// import KEEN_LOGO from '@salesforce/contentAssetUrl/keenlogo';
 import CUSTOMCSS from '@salesforce/resourceUrl/customcss';
 import createAccount from '@salesforce/apex/PTCFormController.createAccount';
 import HTML2CANVAS from '@salesforce/resourceUrl/HTML2CANVAS';
@@ -23,11 +23,12 @@ export default class PTCFormForKeen extends LightningElement {
     ownerId = '';
     value = [];
     valueDays = [];
-    //keenLogoUrl = KEEN_LOGO;
+    keenLogoUrl = "";
     isCssLoaded = false;    
 
     handleProgressValueChange(event) {
         this.signCaptured = event.detail;
+        console.log("New Changes ----------->>>>");
         console.log('this.signCaptured -- '+this.signCaptured);
     }
 

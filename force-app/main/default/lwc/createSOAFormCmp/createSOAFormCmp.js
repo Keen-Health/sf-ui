@@ -17,6 +17,7 @@ export default class CreateSOAFormCmp extends NavigationMixin(LightningElement) 
      this.fromHomePage  = this.recordId == undefined ? true : false;  
      console.log("---> FROM HOME PAGE" +   this.fromHomePage);
         this.navigatetoForm();
+        // this.handleNavigate();
     }
  
 
@@ -79,6 +80,19 @@ export default class CreateSOAFormCmp extends NavigationMixin(LightningElement) 
         console.log("navigatetoForm---->")
     }
 
-       
+    handleNavigate() {
+        const config = {
+            type: 'standard__webPage',
+            attributes: {
+                url: encodeURI('https://choosekeen--ravked.sandbox.my.site.com/SOAForm?recordId=' + this.recordId)
+            },
+            state:{
+                recordId : this.recordId
+            }
+            // sbx: https://choosekeen--agrinfo.sandbox.my.site.com/Event/s/eventspage?eventId='+this.eventId+'%3DownerId%3D'+this.userId
+            // prod: https://choosekeen.force.com/Event/s/eventspage?eventId='+this.eventId+'%3DownerId%3D'+this.userId
+        };
+        this[NavigationMixin.Navigate](config);
+      }   
         
     }

@@ -45,7 +45,7 @@
                 </p>
             </lightning-layout-item>
             <lightning-layout-item class="slds-p-vertical_x-small" size="12" small-device-size="12">
-                <h2>
+                <h2><span title="required" class="slds-required">*</span>
                     Please check the type of product(s) you want the agent to discuss.
                     <br />(Refer below for product type descriptions)
                 </h2>
@@ -72,9 +72,10 @@
                     products you indicated above. Please note, the person who will discuss the products is
                     either employed or contracted by a Medicare plan. They do not work directly for the
                     federal government. This individual may also be paid based on your enrollment in a plan.
-                    <br />
+                </p>
+                <p class="slds-m-top_small">
                     Signing this form does NOT obligate you to enroll in a plan, affect your current
-                    enrollment, or enroll you in a Medicare plan
+                    enrollment, or enroll you in a Medicare plan.
                 </p>
             </lightning-layout-item>
             <lightning-layout-item class="slds-p-vertical_x-small" size="12" small-device-size="12">
@@ -82,14 +83,14 @@
                 <lightning-layout multiple-rows>
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
                         small-device-size="12" medium-device-size="4">
-                        <lightning-input disabled class="fieldvalidate" required label="Agent Name:" name="agentName"
+                        <lightning-input disabled class="fieldvalidate" required label="Agent name:" name="agentName"
                             max-length="80" onchange={handleChange} value={inputFieldData.agentName}>
                         </lightning-input>
                     </lightning-layout-item>
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
                         small-device-size="12" medium-device-size="4">
-                        <lightning-input  class="fieldvalidate" required label="Agent phone:" name="agentPhone"
-                           type="tel" pattern="[0-9]{10}$" onchange={handleChange}>
+                        <lightning-input class="fieldvalidate" required label="Agent phone:" name="agentPhone"
+                            type="tel" disabled value={inputFieldData.agentPhone} onchange={handleChange}>
                         </lightning-input>
                     </lightning-layout-item>
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
@@ -108,7 +109,7 @@
                     </lightning-layout-item>
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
                         small-device-size="12" medium-device-size="4">
-                        <lightning-input label="Beneficiary Phone:" name="beneficiaryPhone" max-length="10" type="tel"
+                        <lightning-input label="Beneficiary phone:" name="beneficiaryPhone" max-length="10" type="tel"
                             pattern="[0-9]{10}$" onchange={handleChange} value={inputFieldData.beneficiaryPhone}>
                         </lightning-input>
                     </lightning-layout-item>
@@ -151,13 +152,12 @@
                         <!-- <lightning-input label="State:" type="text" name="state" onchange={handleChange}>
                         </lightning-input> -->
                         <lightning-combobox class="fieldvalidate" required name="state" label="State"
-                            value={inputFieldData.state} placeholder="Select Method" options={stateInputOptions}
+                            value={inputFieldData.state} placeholder="Select State/None" options={stateInputOptions}
                             onchange={handleChange}></lightning-combobox>
                     </lightning-layout-item>
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
                         small-device-size="12" medium-device-size="4">
-                        <p><span title="required"
-                            class="slds-required">*</span>Initial method of contact:
+                        <p><span title="required" class="slds-required">*</span>Initial method of contact:
                             (Indicate here if beneficiary was a walk in.)
                         </p>
                         <lightning-combobox class="fieldvalidate" required name="methodOfContact" variant="label-hidden"
@@ -166,20 +166,22 @@
                     </lightning-layout-item>
                     <lightning-layout-item class="slds-p-vertical_x-small" size="12" small-device-size="12">
                         <div class="slds-grid slds-wrap">
-                            <label class="title-heading slds-p-right_medium">Agent's Signature:</label>
+                            <label class="slds-p-right_medium">Agent's Signature:</label>
                             <lightning-layout-item class="slds-p-vertical_x-small">
                                 <c-signature-Panel onprogressvaluechange={handleAgentValueChange} id="signatureAgent">
                                 </c-signature-Panel>
+                                <p class="slds-required slds-size_4-of-4" if:true={agentSignRequired}>Please sign and
+                                    submit.</p>
                                 <button class="slds-button slds-button_brand slds-m-top_x-small"
                                     onclick={clearSignature}>Clear Signature</button>
                             </lightning-layout-item>
                         </div>
                     </lightning-layout-item>
                     <lightning-layout-item class="slds-p-vertical_x-small" size="12" small-device-size="12">
-                        <h2>
-                            <span title="required"
-                            class="slds-required">*</span> Plan(s) the agent represented during this meeting:
-                        </h2>
+                        <p>
+                            <span title="required" class="slds-required">*</span> Plan(s) the agent represented during
+                            this meeting:
+                        </p>
                         <lightning-radio-group name="plansByAgent" class="fieldvalidate slds-p-top_small"
                             options={plansByAgent} value={inputFieldData.plansByAgent} type="radio"
                             onchange={handlePlansInputChange} required variant="label-hidden"></lightning-radio-group>
@@ -193,21 +195,35 @@
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
                         small-device-size="12" medium-device-size="4">
                         <lightning-input label="Date of appointment completed:" name="dateOfAppointment" required
-                            class="fieldvalidate" type="date" min={formatedDate} max={soaMaxDate} onchange={handleChange}>
+                            class="fieldvalidate" type="date" min={formatedDate} max={soaMaxDate}
+                            onchange={handleChange}>
                         </lightning-input>
                     </lightning-layout-item>
                 </lightning-layout>
             </lightning-layout-item>
             <lightning-layout-item class="slds-p-vertical_x-small" size="12" small-device-size="12">
                 <h2>Plan Use Only</h2>
-                <p>
+                <label>
                     Agent, if the form was signed by the beneficiary at the time of appointment, provide
                     explanation why SOA was not documented prior to meeting:
-                    <br />*Scope of Appointment documentation is subject to CMS record retention
-                    requirements*
-                    <br />A Coordinated Care plan with a Medicare Advantage contract and a Medicare-approved
-                    Part D sponsor
-                </p>
+                </label>
+                    <lightning-input class="fieldvalidate" required label="Beneficiary last name:"
+                      max-length="200" onchange={handleChange}
+                    value={inputFieldData.explanation}>
+                </lightning-input>
+                <div class="slds-align_absolute-center">
+                    <p>
+                        *Scope of Appointment documentation is subject to CMS record retention
+                        requirements*
+                    </p>
+                    
+                    <p> 
+                        
+                        A Coordinated Care plan with a Medicare Advantage contract and a Medicare-approved
+                        Part D sponsor
+                    </p>
+                </div>
+               
             </lightning-layout-item>
             <lightning-layout-item class="slds-p-vertical_x-small" size="12" small-device-size="12">
                 <h2>Stand-alone Medicare Prescription Drug Plans (Part D)</h2>
@@ -229,15 +245,15 @@
                         provides all Original Medicare Part A and Part B health coverage and sometimes
                         covers Part D prescription drug coverage. In most HMOs, you can only get your care
                         from doctors or hospitals in the plan's network (except in emergencies).
-                        <!-- </li>
-                    <li> -->
+                    </li>
+                    <li>
                         Medicare Preferred Provider Organization (PPO) Plan - A Medicare Advantage Plan that
                         provides all Original Medicare Part A and Part B health coverage and sometimes
                         covers Part D prescription drug coverage. PPOs have network doctors and hospitals
-                        but you can also use out-of-network providers, usually at a higher cost. Medicare.
-                        <!-- </li>
-                    <li> -->
-                        Private Fee-For-Service (PFFS) Plan - A Medicare Advantage Plan in which you may go
+                        but you can also use out-of-network providers, usually at a higher cost.
+                    </li>
+                    <li>
+                        Medicare Private Fee-For-Service (PFFS) Plan - A Medicare Advantage Plan in which you may go
                         to any Medicare-approved doctor, hospital and provider that accepts the plan's
                         payment, terms and conditions and agrees to treat you - not all providers will. If
                         you join a PFFS Plan that has a network, you can see any of the network providers
@@ -250,7 +266,6 @@
                         out-of-network benefit. Like the HMO, members are required to designate an
                         in-network physician to be the primary health care provider. You can use doctors,
                         hospitals, and providers outside of the network for an additional cost.
-
                     </li>
                     <li>
                         Medicare Special Needs Plan (SNP) - A Medicare Advantage Plan that has a benefit
@@ -303,20 +318,22 @@
         <!-- Modal/Popup Box LWC starts here -->
         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
             aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+
             <div class="slds-modal__container">
-                <!-- Modal/Popup Box LWC body starts here -->
-                <div class="slds-modal__content slds-p-around_small" id="modal-content-id-1"
-                    style="background-color:#f3f3f3">
-                    <p>The record you are about to create is potential duplicate of the below
-                        existing record(s). Please review before creating the new record.
-                    </p>
-                </div>
-                <!-- <div if:true={data} class="slds-modal__content slds-p-left_medium slds-p-right_medium slds-p-bottom_medium slds-grid slds-wrap"> -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" onclick={closeDupModal}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                            size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2>Successfully saved SOA. Please review the below potential member matches to associate the generated SOA document.
+                    </h2>
+                </header>
+
                 <lightning-datatable class="slds-max-medium-table_stacked-horizontal" key-field="Id" data={dupModaldata}
                     columns={dupColumns} onrowselection={onSelectDupRow} max-row-selection="1">
-
                 </lightning-datatable>
-                <!-- </div> -->
                 <!-- Modal/Popup Box LWC footer starts here -->
                 <footer class="slds-modal__footer" style="text-align: center">
                     <button disabled={disableAssociateSOABtn} class="slds-button slds-button_neutral"
@@ -331,9 +348,11 @@
     <!-- </footer> -->
 
     <div class="spinner-container" if:true={isLoading}>
-     
-        <div class="slds-backdrop slds-backdrop_open"> <lightning-spinner  variant="brand" if:true={isLoading} alternative-text="Loading" size="large">
-        </lightning-spinner></div>
-       
+
+        <div class="slds-backdrop slds-backdrop_open">
+            <lightning-spinner variant="brand" if:true={isLoading} alternative-text="Loading" size="large">
+            </lightning-spinner>
+        </div>
+
     </div>
 </template>

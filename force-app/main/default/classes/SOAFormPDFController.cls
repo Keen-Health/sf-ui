@@ -1,13 +1,21 @@
 public with sharing class SOAFormPDFController {
     public String inputJson = 'hello world';
   
-   public String jsonRes { get;set; }   
+    public String jsonRes { get;set; }
+    // public Boolean jsonData = true;
   
    
     public static void sendVFData(String jsonRes){
             jsonRes = 'hello world';
             
         }
+
+ 
+//     public Boolean getInputJson(){
+//         jsonData = false;
+//     return jsonData;
+     
+// }
     // @AuraEnabled
     //     public static void sendVFData(String inputJson) {
     //         // PageReference pageReference = new PageReference('/apex/SOAPdfGenerate');
@@ -39,12 +47,14 @@ public with sharing class SOAFormPDFController {
         //Create Document
          ContentVersion cv = new ContentVersion();
          cv.ContentLocation = 'S'; 
-         cv.Title = 'Scope of Appointment ' +  acc.Name;
+         cv.Title = 'Scope of Appointment for ' +  acc.Name + ' generated on ' + system.now();
          cv.PathOnClient =  acc.Name +'.pdf';
          cv.VersionData = Blob.valueOf('Content of pdf');
          cv.Origin = 'H';
          cv.OwnerId = acc.OwnerId;
          cv.VersionData = bdata;
+         cv.DocumentName__c = 'Scope of Appointment';
+         cv.Source__c = 'Other';
          cv.IsMajorVersion = true;
          insert cv;
          //Get Content Document Id

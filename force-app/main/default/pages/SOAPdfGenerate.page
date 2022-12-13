@@ -1,8 +1,10 @@
 <apex:page controller="SOAFormPDFController" renderAs="pdf"  
-applyHtmlTag="true" showHeader="false" cache="true" readOnly="true">
+applyHtmlTag="true"  showHeader="false" cache="true" readOnly="true">
 <!-- Begin Default Content REMOVE THIS -->
+
 <h1>Scope of Sales Appointment Confirmation Form</h1>
-<p>{!jsonRes}</p>
+<!-- <apex:outputText>{!jsonData}</apex:outputText>
+<p>{!jsonData}</p> -->
 <!-- <p>{!jsonRes.inputTwo}</p> -->
 <!-- <c:sOAFormCmp accountId="{!aId}" contactId="{!bId}"/>  -->
 <!-- End Default Content REMOVE THIS -->

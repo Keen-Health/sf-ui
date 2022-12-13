@@ -94,6 +94,8 @@ export default class DualRecordForm extends LightningElement {
     }
 
     handlePhoneClick(event) {
+
+  console.log("----------->tempPhDetail['PrimaryContactFieldName__c']" + JSON.stringify(this.phoneDetail) );
         
    if(this.showEditField == true) {
     let tempPhDetail  = JSON.parse(JSON.stringify(this.phoneDetail)); 
@@ -118,8 +120,16 @@ export default class DualRecordForm extends LightningElement {
                 temp[key] = temp[key].value;
             }
             this.phoneDetail = temp;
+            if(this.phoneDetail['PrimaryContactFieldName__c'] == null){
+                this.phoneDetail['PrimaryContactFieldName__c'] = 'PersonHomePhone';
+            }
+            
 
         }
+
+        
+
+        console.log("----------->tempPhDetail['PrimaryContactFieldName__c']" + JSON.stringify(this.phoneDetail) );
         this.isModalOpen = true;
     }
     changePhoneNumber(event) {

@@ -340,26 +340,14 @@ public with sharing class GenerateQuoteController {
         return response;
     }
 
-    @AuraEnabled(cacheable=true)
-    public static agentWrapper getAgentData(){
 
-        agentWrapper agentData = new agentWrapper();
-        agentData.userEmail = UserInfo.getUserEmail();
-        agentData.firstName = UserInfo.getFirstName();
-        agentData.lastName = UserInfo.getLastName();
-        agentData.name = UserInfo.getName();
+    @AuraEnabled(cacheable=true)
+    public static List<User> getAgentData(){
+        List<User> agentData = [ SELECT Name,Phone,Email FROM User
+
+                                WHERE Id =: UserInfo.getUserId()];
         return agentData;
     }
 
-    public class agentWrapper{
-        @AuraEnabled
-        public String userEmail;
-        @AuraEnabled
-        public String firstName;
-        @AuraEnabled
-        public String lastName;
-        @AuraEnabled
-        public String name;
-    }
-    
+   
 }

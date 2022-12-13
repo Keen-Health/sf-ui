@@ -1,5 +1,8 @@
 import { api, LightningElement, track, wire } from 'lwc';
 import { NavigationMixin } from "lightning/navigation";
+import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { CurrentPageReference } from 'lightning/navigation';
 import createAccount from '@salesforce/apex/SOADupCheckAndCreateController.createAccount';
 import getMatchedAccounts from '@salesforce/apex/SOADupCheckAndCreateController.matchedAccounts';
 import savePDFToSF from '@salesforce/apex/SOAFormPDFController.savePDFToSF';
@@ -9,8 +12,9 @@ import getAgentData from '@salesforce/apex/GenerateQuoteController.getAgentData'
 import getPickListValues from '@salesforce/apex/PickListController.getPickListValues';
 // import sendPDFData from '@salesforce/apex/SOAFormPDFController.sendPDFData';
 // import jspdf from '@salesforce/resourceUrl/jspdf';
-import { loadScript } from 'lightning/platformResourceLoader';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import CUSTOMCSS from '@salesforce/resourceUrl/customcss';
+import HTML2CANVAS from '@salesforce/resourceUrl/HTML2CANVAS';
+import jquery from '@salesforce/resourceUrl/jquery';
 
 
 export default class SOAFormCmp extends NavigationMixin(LightningElement) {
@@ -19,8 +23,6 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     @api fromHomePage;
     agentInfo;
     memberInfo;
-    // @api carrierList;
-    // @api stateList;
     stateList = [];
     carrierList = [];
     isDupModal = false;
@@ -28,18 +30,20 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     soaMaxDate;
     userSelectedDupID;
     disableAssociateSOABtn = true;
+    agentSignRequired = false;
     dupColumns = [
         {
             label: 'Name', fieldName: 'nameUrl', type: 'url',
             typeAttributes: { label: { fieldName: 'Full_Name__c' }, target: '_blank' }
         },
-        { label: 'DoB', fieldName: 'DoB__c', type: 'Date' },
+      
         { label: 'Phone', fieldName: 'Phone', type: 'Phone' },
+        { label: 'Email', fieldName: 'PersonEmail', type: 'email' },
     ];
     isLoading = false;
     todaysDate = new Date();
     formatedDate = this.todaysDate.getFullYear() + '-' + (this.todaysDate.getMonth() + 1) + '-' + this.todaysDate.getDate();
-  
+
 
     @track inputFieldData = {
         "typeOfProducts": [],
@@ -50,6 +54,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         // "beneficiaryLastName": "",
         // "beneficiaryPhone": "",
         "date": this.formatedDate,
+        "explanation" : "",
         // "streetAddress": "",
         // "addressLineTwo": "",
         // "city": "",
@@ -75,10 +80,12 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         const future = new Date();
         future.setDate(future.getDate() + 30);
         this.soaMaxDate = future.getFullYear() + '-' + (future.getMonth() + 1) + '-' + future.getDate();
-        console.log("getAgentData--->" + JSON.stringify(data))
+        console.log("AgentInfo--->" + JSON.stringify(data));
         console.log("recordId--->" + this.recordId);
         if (this.validVariable(data)) {
-            this.inputFieldData['agentName'] = data['name'];
+            const info = data[0];
+            this.inputFieldData['agentName'] = info['Name'];
+            this.inputFieldData['agentPhone'] = info['Phone'];
         }
         if (this.recordId != undefined) {
             getAccountInfo({ accountId: this.recordId }).then(memberData => {
@@ -88,12 +95,22 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
                         this.memberInfo = keenMemberAccData[key];
                     }
                     this.setDataToLocalObj();
-                    console.log("getAccountInfo--->" + JSON.stringify(this.memberInfo))
+                    console.log("Member Info--->" + JSON.stringify(this.memberInfo))
                 };
             });
 
         }
     };
+
+    @wire(CurrentPageReference)
+    getStateParameters(currentPageReference) {
+        console.log("currentPageReference <<<<<<<<>>>>>>>>" + currentPageReference)
+
+       if (currentPageReference) {
+          console.log("currentPageReference >>>>>>>>" + currentPageReference)
+          
+       }
+    }
 
     @wire(getPickListValues, { objectName: 'Account', selectedField: 'Carrier_list__c' })
     wiredCarrierList({ error, data }) {
@@ -111,6 +128,31 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         }
     };
 
+    // connectedCallback() {
+    //     this.getUrlParameter();        
+    // }
+
+    getUrlParameter = function getUrlParameter(sParam) {
+        console.log("sParam" + sParam)
+        console.log("Before ----> ***** " +  this.recordId)
+        console.log("window.location.search" + window.location.search)
+
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('?'),
+            sParameterName,
+            i;
+        
+        for (i = 0; i < sURLVariables.length; i++) {            
+            sParameterName = sURLVariables[i].split('=');
+            this.recordId = sParameterName[1];         
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+
+        console.log("After ----> ***** " +  this.recordId)
+    };
+
     validVariable(variable) {
         if (variable === null || variable === "" || variable === undefined) {
             return false
@@ -118,28 +160,43 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         return true
     }
 
-    renderedCallback() {
+    // renderedCallback(){
+    //     //this.template.querySelector("lightning-input").style.labelSize="40px";
+    //     loadScript(this, HTML2CANVAS );
+    //     loadScript(this, jquery );
+    //     //
+    //     if(this.isCssLoaded) return
+    //     this.isCssLoaded = true;
+    //     loadStyle(this,CUSTOMCSS).then(()=>{
+    //         //console.log('loaded');
+    //     })
+    //     .catch(error=>{
+    //         console.log('error to load');
+    //     });
+    // }
+
+    // renderedCallback() {
 
 
-        console.log("renderedCallback--------------------->");
+    //     console.log("renderedCallback--------------------->");
 
-        //    this.apiCalls();
-        // if (this.jsPdfInitialized) {
-        //     return;
-        // }
-        // this.jsPdfInitialized = true;
-        // console.error("before latest new from PDFFFFFF");
-        // Promise.all([
+    //     //    this.apiCalls();
+    //     // if (this.jsPdfInitialized) {
+    //     //     return;
+    //     // }
+    //     // this.jsPdfInitialized = true;
+    //     // console.error("before latest new from PDFFFFFF");
+    //     // Promise.all([
 
-        //     loadScript(this, jspdf).then(() => {
-        //         console.log("jsPDF loaded");
-        //     }).catch(error => {
-        //         console.error("Error from jsPDF");
-        //         console.error("jsPDF " + error);
-        //     })
-        // ]);
+    //     //     loadScript(this, jspdf).then(() => {
+    //     //         console.log("jsPDF loaded");
+    //     //     }).catch(error => {
+    //     //         console.error("Error from jsPDF");
+    //     //         console.error("jsPDF " + error);
+    //     //     })
+    //     // ]);
 
-    }
+    // }
 
     onCancel() {
         this.fromHomePage ? this.goToHomePage() : this.goToMemberPage();
@@ -154,52 +211,20 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         });
     };
 
-    goToMemberPage() {
+    goToMemberPage(id) {
+        console.log("goToMemberPage--->" + id);
         this[NavigationMixin.Navigate]({
             type: 'standard__recordPage',
             attributes: {
-                recordId: this.recordId,
+                recordId: this.fromHomePage ? id : this.recordId,
                 objectApiName: 'Account',
-                // relationshipApiName: 'CaseComments',
                 actionName: 'view'
             }
-        });
+        }).then(()=>{
+            this.isLoading = false;
+        })
     }
 
-
-
-
-    apiCalls() {
-        getAgentData().then(agentData => {
-            console.log("agentData: " + JSON.stringify(agentData));
-            this.agentInfo = agentData;
-            getPickListValues({ objectName: 'Account', selectedField: 'Carrier_list__c' }).then(carrierList => {
-                console.log("Carrier_list__c" + JSON.stringify(carrierList) + carrierList);
-                this.carrierList = carrierList;
-                getPickListValues({ objectName: 'Account', selectedField: 'StatePicklist__c' }).then(stateList => {
-                    this.stateList = stateList;
-                    if (this.recordId != undefined) {
-                        getAccountInfo({ accountId: this.recordId }).then(memberData => {
-                            if (this.agentInfo != undefined) {
-                                this.inputFieldData['agentName'] = this.agentInfo['name'];
-                            }
-                            if (!this.fromHomePage && memberData != undefined) {
-                                let keenMemberAccData = JSON.parse(JSON.stringify(memberData.keenMemberAccountMap));
-                                for (var key in keenMemberAccData) {
-                                    this.memberInfo = keenMemberAccData[key];
-                                }
-                                this.setDataToLocalObj();
-                                console.log("this.memberInfo in Create" + JSON.stringify(this.memberInfo))
-                            }
-                        })
-                    } else if (this.agentInfo != undefined) {
-                        this.inputFieldData['agentName'] = this.agentInfo['name'];
-                    }
-
-                })
-            })
-        });
-    }
 
     setDataToLocalObj() {
         const data = this.memberInfo;
@@ -242,37 +267,47 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
             }
         });
 
+        if(!this.inputFieldData['agentSignatureStatus']){
+            this.clearSignature();
+            this.agentSignRequired = true;
+        }else{
+            this.agentSignRequired = false;
+        }
+
+   
+
         return isValid && this.inputFieldData['agentSignatureStatus'];
     };
 
     onSelectDupRow(e) {
-        console.log("++++ DUP evnt -->" + JSON.stringify(e));
+        console.log("DUP evnt -->" + JSON.stringify(e));
         const selectedRows = e.detail.selectedRows
         if (selectedRows) {
             this.userSelectedDupID = selectedRows[0].Id;
             this.disableAssociateSOABtn = false;
-            console.log("++++ ID:::" + this.userSelectedDupID)
+            console.log("ID's:::" + this.userSelectedDupID)
         }
 
     }
 
     submitDetails() {
-        console.log("---------->neww ONSUBMIT");
-        // this.generatePDF(this.recordId);
+        console.log("---------->ONSUBMIT");
+        const msg = "";
+        // this. generatePDF(this.recordId, msg);
 
         const objChild1 = this.template.querySelector('c-signature-Panel');
         this.inputFieldData['agentSignatureURL'] = JSON.stringify(objChild1.getImageURL());
 
-        console.log("Agent Signature Link-->" + JSON.stringify(objChild1.getImageURL()));
+        console.log("Agent Signature Image Url--->" + JSON.stringify(objChild1.getImageURL()));
 
         const isValid = this.handleCheckValidation();
-        // this.fromHomePage = this.recordId == this.recordId ? true : false;
-        console.log("------>" + this.fromHomePage);
+
+        console.log("FromHomePage--->" + this.fromHomePage);
         if (isValid && this.fromHomePage) {
             this.isLoading = true;
             getMatchedAccounts({
                 firstName: this.inputFieldData['beneficiaryFirstName'],
-                lastName: this.inputFieldData['beneficiaryLastName']
+                lastName: this.inputFieldData['beneficiaryLastName'],
             }).then((matchedAccountList) => {
 
                 console.log("matchedAccountList" + JSON.stringify(matchedAccountList));
@@ -281,48 +316,42 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
                 } else {
                     this.showDuplicateAccModal(matchedAccountList);
                 }
+            }).catch(err=>{
+                console.error("getMatchedAccounts --->" + JSON.stringify(err));
             })
         } else if (isValid && !this.fromHomePage) {
+            this.isLoading = true;
             console.log("----> savePDFInSF <----")
-
+            const msg = "Successfully added SOA to " +
+                this.inputFieldData['beneficiaryFirstName'] + " " + this.inputFieldData['beneficiaryLastName'] +
+                " and associated the SOA";
             this.generatePDF(this.recordId, msg);
         }
         else {
             this.showErrorToast('Please fill out all required fields to submit.');
         };
 
-
-
-
-        console.log("inputFieldData" + JSON.stringify(this.inputFieldData));
-        console.log("@api recordId;" + this.recordId);
-        console.log("isValid" + typeof isValid + isValid);
-
-        // isValid ? () => {
-        //     this.isLoading = true;
-        //     setTimeout(() => {
-        //         this.isLoading = false;
-        //         this.onCancel();
-        //     }, 5000)
-        // } : "";
+        console.log("OnSubmit inputFieldData-->" + JSON.stringify(this.inputFieldData));
+        console.log("OnSubmit recordId-->" + this.recordId);
+        console.log("OnSubmit isValid-->" + typeof isValid + isValid);
 
     };
 
     generatePDF(id, msg) {
-        console.log("generatePDF" + id);
-        //    const jsonStr=  {'inputOne' : 'nameis', 'inputTwo' : 'phone number'}
+        console.log("generatePDF ID--->" + id);
+        //    const jsonStr=  {'firstName' : 'FIRSTNAME', 'lastName' : 'LASTNAME'}
         //    sendVFData().then(() => {
 
         savePDFToSF({ accoundId: id }).then((data) => {
             console.log("---->>> PDF SAVED--ID:" + id);
             this.showSuccessToast(msg);
             if (this.fromHomePage) {
-                this.goToHomePage();
+                this.goToMemberPage(id);
             } else {
                 this.goToMemberPage();
             }
-            this.isLoading = false;
-        }).catch(error => { console.log("sOAFormData" + error) });
+            
+        }).catch(error => { console.error("savePDFToSF Error-->" + JSON.stringify(error)) });
 
         // );
     }
@@ -345,6 +374,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
             "beneficiaryPhone": this.inputFieldData['beneficiaryPhone'],
             "personMailingCity": this.inputFieldData['city'],
             "personMailingState": "Texas",
+            "personMailingStreet": this.inputFieldData['streetAddress'],
             "personalMailingCounty": this.inputFieldData['county'],
             "personMailingPostalCode": this.inputFieldData['zipCode'],
             "PrimaryContactFieldName__c": this.inputFieldData['primaryPhone']
@@ -353,19 +383,19 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         createAccount({ jSONstr: JSON.stringify(jSONstr) })
             .then(response => {
                 const id = response;
-                
+
                 console.log("--->Member Account Created successfully---" + JSON.stringify(response));
-                
+
                 const msg = "Successfully created member record for " +
-                this.inputFieldData['beneficiaryFirstName'] + " " + this.inputFieldData['beneficiaryLastName'] +
-                " and associated the SOA";
-                this.generatePDF(id,msg);
-           
+                    this.inputFieldData['beneficiaryFirstName'] + " " + this.inputFieldData['beneficiaryLastName'] +
+                    " and associated the SOA";
+                this.generatePDF(id, msg);
+
             })
             .catch(err => {
                 this.isLoading = false;
                 this.showErrorToast('Failed to create account!');
-                console.log("--->Member Account Created Failed---" + JSON.stringify(err));
+                console.error("--->Member Account Created Failed---" + JSON.stringify(err));
             });
     }
 
@@ -380,8 +410,8 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         console.log("associateSOA---" + this.userSelectedDupID);
         this.isLoading = true;
         const msg = "Successfully added SOA to " +
-        this.inputFieldData['beneficiaryFirstName'] + " " + this.inputFieldData['beneficiaryLastName'] +
-        " and associated the SOA"
+            this.inputFieldData['beneficiaryFirstName'] + " " + this.inputFieldData['beneficiaryLastName'] +
+            " and associated the SOA";
         this.generatePDF(this.userSelectedDupID, msg);
     }
 
@@ -474,7 +504,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     //         const element = this.template.querySelector('.main-container').innerHTML;
     //         // console.log("element" + element)
     //         // // doc.save("a4.pdf");
-    //         // const { jspdf } = window.jspdf;
+    //         // const { ; } = window.jspdf;
     //         // var doc = new jspdf();
     //         // // doc.setFont('Helvetica', 'Italic')
     //         // //                     .setFontSize(12)

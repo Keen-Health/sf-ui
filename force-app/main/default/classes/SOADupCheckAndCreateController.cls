@@ -21,7 +21,8 @@ public with sharing class SOADupCheckAndCreateController {
             acc.LastName = (String)(soaData.get('beneficiaryLastName')); 
             acc.Phone = (String)soaData.get('beneficiaryPhone'); 
             acc.PersonMailingCity = (String)soaData.get('personMailingCity');   
-            acc.PersonMailingState = (String)soaData.get('personMailingState');  
+            acc.PersonMailingState = (String)soaData.get('personMailingState');
+            acc.PersonMailingStreet = (String)soaData.get('personMailingStreet');
             acc.County__c = (String)soaData.get('personalMailingCounty');
             acc.PrimaryContactFieldName__c = (String)soaData.get('PrimaryContactFieldName__c');   
             insert acc;
