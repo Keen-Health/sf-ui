@@ -162,7 +162,9 @@
                         </p>
                         <lightning-combobox class="fieldvalidate" required name="methodOfContact" variant="label-hidden"
                             value={inputFieldData.intialMethodOfContact} placeholder="Select Method"
-                            options={methodOfContactOptions} onchange={handleChange}></lightning-combobox>
+                            options={methodOfContactOptions} onchange={handleIntialMethodOfContact}></lightning-combobox>
+                            <lightning-input if:true={showOtherInputBox} class="fieldvalidate" required label="Other" name="otherMethodOfContactOptions" max-length="100" onchange={handleChange}
+                    value={inputFieldData.otherMethodOfContactOptions}></lightning-input>
                     </lightning-layout-item>
                     <lightning-layout-item class="slds-p-vertical_x-small" size="12" small-device-size="12">
                         <div class="slds-grid slds-wrap">
@@ -203,27 +205,22 @@
             </lightning-layout-item>
             <lightning-layout-item class="slds-p-vertical_x-small" size="12" small-device-size="12">
                 <h2>Plan Use Only</h2>
-                <label>
-                    Agent, if the form was signed by the beneficiary at the time of appointment, provide
-                    explanation why SOA was not documented prior to meeting:
-                </label>
-                    <lightning-input class="fieldvalidate" required label="Beneficiary last name:"
-                      max-length="200" onchange={handleChange}
+                
+                <lightning-input class="fieldvalidate slds-p-top_small" label="Agent, if the form was signed by the beneficiary at the time of appointment, provide
+                explanation why SOA was not documented prior to meeting:" name="explanation" max-length="250" onchange={handleChange}
                     value={inputFieldData.explanation}>
                 </lightning-input>
-                <div class="slds-align_absolute-center">
-                    <p>
+                <div class="slds-p-top_small">
+                    <p class="slds-align_absolute-center">
                         *Scope of Appointment documentation is subject to CMS record retention
                         requirements*
                     </p>
-                    
-                    <p> 
-                        
+                    <p class="slds-align_absolute-center">
                         A Coordinated Care plan with a Medicare Advantage contract and a Medicare-approved
                         Part D sponsor
                     </p>
                 </div>
-               
+
             </lightning-layout-item>
             <lightning-layout-item class="slds-p-vertical_x-small" size="12" small-device-size="12">
                 <h2>Stand-alone Medicare Prescription Drug Plans (Part D)</h2>
@@ -327,7 +324,8 @@
                             size="small"></lightning-icon>
                         <span class="slds-assistive-text">Close</span>
                     </button>
-                    <h2>Successfully saved SOA. Please review the below potential member matches to associate the generated SOA document.
+                    <h2>Successfully saved SOA. Please review the below potential member matches to associate the
+                        generated SOA document.
                     </h2>
                 </header>
 

@@ -26,6 +26,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     stateList = [];
     carrierList = [];
     isDupModal = false;
+    showOtherInputBox = false;
     dupModaldata;
     soaMaxDate;
     userSelectedDupID;
@@ -160,20 +161,20 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         return true
     }
 
-    // renderedCallback(){
-    //     //this.template.querySelector("lightning-input").style.labelSize="40px";
-    //     loadScript(this, HTML2CANVAS );
-    //     loadScript(this, jquery );
-    //     //
-    //     if(this.isCssLoaded) return
-    //     this.isCssLoaded = true;
-    //     loadStyle(this,CUSTOMCSS).then(()=>{
-    //         //console.log('loaded');
-    //     })
-    //     .catch(error=>{
-    //         console.log('error to load');
-    //     });
-    // }
+    renderedCallback(){
+        //this.template.querySelector("lightning-input").style.labelSize="40px";
+        loadScript(this, HTML2CANVAS );
+        loadScript(this, jquery );
+        //
+        if(this.isCssLoaded) return
+        this.isCssLoaded = true;
+        loadStyle(this,CUSTOMCSS).then(()=>{
+            //console.log('loaded');
+        })
+        .catch(error=>{
+            console.log('error to load');
+        });
+    }
 
     // renderedCallback() {
 
@@ -250,6 +251,13 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         this.inputFieldData[e.target.name] = e.target.value;
 
     };
+
+    handleIntialMethodOfContact(event){
+        console.log("handleIntialMethodOfContact" +  event.target.value   + ">>>" + event.target.name )
+        const value = event.target.value;
+        this.showOtherInputBox = value === 'other' ? true : false;
+        this.inputFieldData[event.target.name] = event.target.value; 
+    }
 
     handlePlansInputChange(event) {
         const value = event.target.value;
@@ -457,8 +465,10 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
             { label: 'Inbound call', value: 'inbound_call' },
             { label: 'In person', value: 'in_person' },
             { label: 'Email', value: 'email' },
+            { label: 'Walk-in', value: 'walk_in' },
             { label: 'Warm transfer', value: 'warm_transfer' },
-            { label: 'Text', value: 'text' }
+            { label: 'Text', value: 'text' },
+            { label: 'Other', value: 'other' }
         ];
     }
 
