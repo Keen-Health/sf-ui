@@ -456,6 +456,7 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
 
     generateQuote() {
         let req = this.getSunfireRequestObject();
+        //console.log('SunfireRequestObject: '+JSON.stringify(req));
         postCallout({ inputJson: JSON.stringify(req) }).then((response) => {
 
         }).catch((error) => {
@@ -679,6 +680,7 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
                     If none of the pharmacies are marked as primary, send the most recent associated pharmacy.
                 */
                 let pharm = "";
+                let mailOrder = "";
                 if (this.member['pharmacies'] && this.member['pharmacies'].length > 0) {
                     this.member['pharmacies'].forEach(element => {
                         if (element.isPharmacyPrimary) {
@@ -687,9 +689,13 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
                     });
                     if (!pharm) {
                         pharm = this.member['pharmacies'][0]['name'];
+                        mailOrder = this.member['pharmacies'][0]['mailOrder'];
                     }
                 }
-                data = pharm;
+                data = {
+                    'name': pharm,
+                    'mailOrder': mailOrder.toLowerCase() == 'yes' ? 'y' : 'n'
+                };
                 break;
             }
             case 'pharmaciesForSF': {
