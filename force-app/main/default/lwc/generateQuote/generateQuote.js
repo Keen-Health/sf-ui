@@ -5,6 +5,7 @@ import { encodeDefaultFieldValues } from 'lightning/pageReferenceUtils';
 import { subscribe, unsubscribe, onError } from 'lightning/empApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import postCallout from '@salesforce/apex/ExternalCallout.postCallout';
+import { getRecordNotifyChange } from 'lightning/uiRecordApi';
 import getAccountInfo from '@salesforce/apex/GenerateQuoteController.getKeenMembersData';
 import updateAccount from '@salesforce/apex/GenerateQuoteController.updateKeenMemberData';
 import getMemberMedicationsInfo from '@salesforce/apex/GenerateQuoteController.getMemberMedication';
@@ -191,6 +192,8 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
     }
 
     closeModal() {
+        //@TODO: Dispatch an event from here to update the parent component.
+
         // Reset data
         this.resetData();
 
@@ -411,6 +414,7 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
 
         updateAccount({ inputJson: JSON.stringify(req) })
             .then(result => {
+                getRecordNotifyChange([{recordId: this.recordId}]);
                 this.callSunfireAPI();
             })
             .catch(error => {
