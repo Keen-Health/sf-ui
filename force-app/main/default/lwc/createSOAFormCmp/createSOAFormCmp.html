@@ -2,11 +2,20 @@
     <lightning-layout>
         <lightning-card class="slds-col" style="padding:0;" title="Scope of Appointment (SOA)">
             <div slot="actions">
-                <lightning-button variant="brand" label="Generate SOA" title="Generate SOA" onclick={onGenerateSOA}
-                    class="slds-m-left_x-small">
-                </lightning-button>
+                <lightning-layout if:true={fromHomePage}>
+                    <lightning-button variant="brand" label="Generate SOA" title="Generate SOA" onclick={onGenerateSOA}
+                        class="slds-m-left_x-small">
+                    </lightning-button>
+                </lightning-layout>
+                <lightning-layout if:false={fromHomePage}>
+                    <lightning-button-menu variant="brand" onselect={onGenerateSOASelect}
+                        alternative-text="Generate SOA" label="Generate SOA" menu-alignment="auto">
+                        <lightning-menu-item value="freshQuote" label="Fresh Quote"></lightning-menu-item>
+                        <lightning-menu-item value="fromLastQuote" label="From Last Quote"></lightning-menu-item>
+                    </lightning-button-menu>
+                </lightning-layout>
             </div>
         </lightning-card>
     </lightning-layout>
- 
+
 </template>

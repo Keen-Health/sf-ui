@@ -10,7 +10,8 @@ public with sharing class GenerateQuoteController {
         try{
             keenMemberData.keenMemberAccountMap = new Map<Id,Account>([select Id,AccountNumber,Salutation,
                                                                         FirstName,LastName,DoB__c,
-                                                                        PersonMailingPostalCode,PersonEmail,
+                                                                        PersonMailingPostalCode,PersonEmail,PersonMailingStreet,
+                                                                        PersonMailingCity,
                                                                         Phone,County__c,PrimaryContactFieldName__c,
                                                                         VerifyPagePrimaryContact__c,PersonAssistantPhone,PersonHomePhone,
                                                                         PersonMobilePhone,PersonOtherPhone,
