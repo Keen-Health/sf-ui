@@ -192,8 +192,6 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
     }
 
     closeModal() {
-        //@TODO: Dispatch an event from here to update the parent component.
-
         // Reset data
         this.resetData();
 
@@ -403,7 +401,6 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
         if (validator) {
             this.saveDataToSF();
         } else if (!isValid.fieldValid) {
-            //this.showErrorToast('Please fill out all required fields indicated with an *.');
             this.showErrorToast('Please fix the error(s) before initiating the data transfer to Sunfire.');
         }
     }
@@ -481,9 +478,11 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
                 const statusCode = response[0]['Sunfire_Status__c'];
                 if (statusCode == 200) {
                     const bodyData = response[0]['Sunfire_Response__c'];
+                    let dt = response[0]['Sunfire_Response_Date__c'];
+                     this.GenerateQuoteBtnHelptext = 'Quote generated successfully on ' + this.getFormattedDate(dt.toString()) + '.';
                     // this.showSuccessToast('Quote generated successfully!');
                     this.isGenerateQuoteBtnDisabled = false;
-                    this.GenerateQuoteBtnHelptext = 'Quote generated successfully on ' + this.getFormattedDate(new Date().toString());
+                    // this.GenerateQuoteBtnHelptext = 'Quote generated successfully on ' + this.getFormattedDate(new Date().toString());
                     this.showSucessResponseModal(bodyData);
                 } else if (statusCode == 405) {
                     this.showErrorToast('Quote generation failed. Please regenerate the quote.');
@@ -540,7 +539,7 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
         let reqObj = {
             "advisor_credentials": {
                 "advisor_email_id": 'desiree.brown@choosekeen.com',  
-                "record_id": '0017700000AQZZXAA5'
+                "record_id": this.getMemberData('id')
             },
             "contact_details": {
                 "salutation": this.getMemberData('salutation'),

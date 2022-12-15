@@ -14,8 +14,10 @@
                 >    
                 <!-- @TODO: this is commented for testing realted lists, once it's done, add this below condition into above. -->
                 <!-- disabled={isGenerateQuoteBtnDisabled} -->
+                <!-- if:true={isGenerateQuoteBtnDisabled}  -->
+                
             </lightning-button>
-            <lightning-helptext if:true={isGenerateQuoteBtnDisabled} 
+            <lightning-helptext  
                 content={GenerateQuoteBtnHelptext}></lightning-helptext>
             <p if:true={isgenerateQuoteTimerEnabled} 
                 class="slds-m-top_x-small slds-m-horizontal_x-small slds-text-body_regular">Please wait for {generateQuoteTimeCount.min}:{generateQuoteTimeCount.sec}min
