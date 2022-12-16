@@ -1,5 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from "lightning/navigation";
+
 export default class CreateSOAFormCmp extends NavigationMixin(LightningElement) {
     @api recordId;
     fromHomePage = true;
@@ -22,7 +23,7 @@ export default class CreateSOAFormCmp extends NavigationMixin(LightningElement) 
         const config = {
             type: 'standard__webPage',
             attributes: {
-                url: 'https://choosekeen--kiskon.sandbox.my.site.com/SOAForm?recordId=' + this.recordId
+                url: 'https://choosekeen--ravked.sandbox.my.site.com/SOAForm?recordId=' + this.recordId
             },
             state: {
                 recordId: this.recordId
@@ -34,3 +35,4 @@ export default class CreateSOAFormCmp extends NavigationMixin(LightningElement) 
     }
 
 }
+

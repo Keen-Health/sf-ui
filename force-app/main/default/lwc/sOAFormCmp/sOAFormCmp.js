@@ -3,11 +3,14 @@ import { NavigationMixin } from "lightning/navigation";
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { CurrentPageReference } from 'lightning/navigation';
+
 import createAccount from '@salesforce/apex/SOAFormController.createAccount';
+import createSOARecord from '@salesforce/apex/SOAFormController.createSOARecord';
+import fetchSOAForminputData from '@salesforce/apex/SOAFormController.fetchSOAForminputData';
 import getMatchedAccounts from '@salesforce/apex/SOAFormController.matchedAccounts';
+
 import savePDFToSF from '@salesforce/apex/SOAFormPDFController.savePDFToSF';
-import getData from '@salesforce/apex/SOAFormPDFController.getData';
-// import sendVFData from '@salesforce/apex/SOAFormPDFController.sendVFData';
+
 import getAccountInfo from '@salesforce/apex/GenerateQuoteController.getKeenMembersData';
 import getAgentData from '@salesforce/apex/GenerateQuoteController.getAgentData';
 import getPickListValues from '@salesforce/apex/PickListController.getPickListValues';
@@ -15,7 +18,7 @@ import getPickListValues from '@salesforce/apex/PickListController.getPickListVa
 // import jspdf from '@salesforce/resourceUrl/jspdf';
 
 
-export default class SOAFormCmp extends LightningElement {
+export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
 
     recordId = undefined;
@@ -43,8 +46,9 @@ export default class SOAFormCmp extends LightningElement {
     ];
     isLoading = false;
     todaysDate = new Date();
-    formatedDate = this.todaysDate.getFullYear() + '-' + (this.todaysDate.getMonth() + 1) + '-' + this.todaysDate.getDate();
+    formatedDate = this.todaysDate.getFullYear() + '-' + (this.todaysDate.getMonth() + 1) + '-' + this.todaysDate.getDate ();
 
+   
 
     @track inputFieldData = {
         "typeOfProducts": [],
@@ -69,12 +73,24 @@ export default class SOAFormCmp extends LightningElement {
         "dateOfAppointment": "",
 
     };
+
+    
     // isModalOpen = false;
     productType = [];
     memberSignCaptured = false;
     agentSignCaptured = false;
     jsPdfInitialized = false;
     showPlanList = false;
+
+    toastMesssages = {
+        'newAccount' : "Successfully created member record for " +
+        this.inputFieldData['beneficiaryFirstName'] + " " + this.inputFieldData['beneficiaryLastName'] +
+        " and associated the SOA", 
+        'existingAccount' : "Successfully added SOA to " +
+        this.inputFieldData['beneficiaryFirstName'] + " " + this.inputFieldData['beneficiaryLastName'] +
+        " and associated the SOA"
+    };
+
 
     @wire(getAgentData)
     wiredAgentData({ error, data }) {
@@ -93,11 +109,12 @@ export default class SOAFormCmp extends LightningElement {
 
     @wire(CurrentPageReference)
     getStateParameters(currentPageReference) {
-        console.log(">>>>>>>>>" + JSON.stringify(currentPageReference));
+        console.log("--->getStateParameters" + JSON.stringify(currentPageReference));
 
         this.recordId = currentPageReference.state?.recordId;
-        console.log("???????" + this.recordId)
-        this.fromHomePage = this.recordId == undefined ? true : false;
+        console.log("---> getStateParameters  recordId : " + this.recordId);
+        this.fromHomePage = this.recordId == "undefined" ||  this.recordId == undefined ? true : false;
+        console.log("---> fromHomePage: " + this.fromHomePage );
         if (this.recordId != undefined) {
             getAccountInfo({ accountId: this.recordId }).then(memberData => {
                 if (memberData != undefined) {
@@ -151,17 +168,19 @@ export default class SOAFormCmp extends LightningElement {
         });
     };
 
-    goToMemberPage(id) {
-        console.log("goToMemberPage--->" + id);
+    goToMemberPage() {
+        console.log("goToMemberPage--->" );
         this[NavigationMixin.Navigate]({
             type: 'standard__recordPage',
             attributes: {
-                recordId: this.fromHomePage ? id : this.recordId,
+                recordId:  this.recordId,
                 objectApiName: 'Account',
                 actionName: 'view'
             }
         }).then(() => {
             this.isLoading = false;
+        }).catch((err) => {
+            console.error("---->goToMemberPage Error: " + JSON.stringify(err));
         })
     }
 
@@ -247,17 +266,12 @@ export default class SOAFormCmp extends LightningElement {
     }
 
     submitDetails() {
-        console.log("---------->ONSUBMIT");
-        const msg = "";
-        getData({"firstName":"Test","LastName":"Lead"})
-        .then((data) => {console.log(">>>>>>>>>>>>>>>>> getData Success")})
-        .catch((err) => {console.log(">>>>>>>>GetData  Error" + JSON.stringify(err))});
-        // this. generatePDF(this.recordId, msg);
+        console.log("----------> ONSUBMIT <------------");
 
         const objChild1 = this.template.querySelector('c-signature-Panel');
         this.inputFieldData['agentSignatureURL'] = JSON.stringify(objChild1.getImageURL());
 
-        console.log("Agent Signature Image Url--->" + JSON.stringify(objChild1.getImageURL()));
+        // console.log("Agent Signature Image Url--->" + JSON.stringify(objChild1.getImageURL()));
 
         const isValid = this.handleCheckValidation();
 
@@ -268,49 +282,67 @@ export default class SOAFormCmp extends LightningElement {
                 firstName: this.inputFieldData['beneficiaryFirstName'],
                 lastName: this.inputFieldData['beneficiaryLastName'],
             }).then((matchedAccountList) => {
-
-                console.log("matchedAccountList" + JSON.stringify(matchedAccountList));
+                console.log("^^^^MatchedAccountList Success:" + JSON.stringify(matchedAccountList));
                 if (matchedAccountList.length == 0) {
                     this.createMemberAccount();
                 } else {
                     this.showDuplicateAccModal(matchedAccountList);
                 }
             }).catch(err => {
-                console.error("getMatchedAccounts --->" + JSON.stringify(err));
+                console.error("^^^^MatchedAccountList Error:" + JSON.stringify(err));
             })
         } else if (isValid && !this.fromHomePage) {
+            console.log("^^^^Existing Account^^^^");
             this.isLoading = true;
-            console.log("----> savePDFInSF <----")
-            const msg = "Successfully added SOA to " +
-                this.inputFieldData['beneficiaryFirstName'] + " " + this.inputFieldData['beneficiaryLastName'] +
-                " and associated the SOA";
-            this.generatePDF(this.recordId, msg);
+            this.createFormDataRecord();
+            // this.generatePDF(this.recordId, msg);
         }
         else {
+            console.log("$$$$$ Validation Failed $$$$$");
             this.showErrorToast('Please fill out all required fields to submit.');
         };
 
-        console.log("OnSubmit inputFieldData-->" + JSON.stringify(this.inputFieldData));
-        console.log("OnSubmit recordId-->" + this.recordId);
-        console.log("OnSubmit isValid-->" + typeof isValid + isValid);
+        // console.log("OnSubmit inputFieldData-->" + JSON.stringify(this.inputFieldData));
+        // console.log("OnSubmit recordId-->" + this.recordId);
+        // console.log("OnSubmit isValid-->" + typeof isValid + isValid);
 
     };
 
-    generatePDF(id, msg) {
-        console.log("generatePDF ID--->" + id);
-        //    const jsonStr=  {'firstName' : 'FIRSTNAME', 'lastName' : 'LASTNAME'}
-        //    sendVFData().then(() => {
+    createFormDataRecord(){
+        console.log("-----> In CreateFormDataRecord----"); 
+        const sampleJSON = {
+            "beneficiaryFirstName" : "John",
+            "beneficiaryLastName" : "High"
+        }
+        createSOARecord({inputJson : JSON.stringify(sampleJSON)}).then((responseSOAId) =>{
+          console.log("responseSOAId>>>" + responseSOAId);
+          // {soaRecordId : responseSOAId}
+          fetchSOAForminputData({soaRecordId : responseSOAId}).then(res =>{
+            console.log("fetchSOAForminputData Sucessful response" + JSON.stringify(res));
+            this.generatePDF();
+          }).catch(err =>{console.log("fetchSOAForminputData Error: " + JSON.stringify(err))});
+       
+        }).catch((err) =>{console.log("createSOARecord Error "+ JSON.stringify(err))});
+    }
 
+    generatePDF() {
+        const id = this.recordId;
+        console.log("generatePDF ID--->" + id);     
         savePDFToSF({ accoundId: id }).then((data) => {
             console.log("---->>> PDF SAVED--ID:" + id);
+            const msg = this.fromHomePage ? this.toastMesssages['newAccount'] : this.toastMesssages['existingAccount'];
             this.showSuccessToast(msg);
-            if (this.fromHomePage) {
-                this.goToMemberPage(id);
-            } else {
-                this.goToMemberPage();
-            }
+            this.goToMemberPage();
+ 
+        }).catch(error => { 
+            console.error("savePDFToSFEE Error-->" + JSON.stringify(error)) 
 
-        }).catch(error => { console.error("savePDFToSF Error-->" + JSON.stringify(error)) });
+            // const msg = this.fromHomePage ? this.toastMesssages['newAccount'] : this.toastMesssages['existingAccount'];
+
+            // this.showSuccessToast(msg);
+            // this.goToMemberPage();
+            
+        });
 
         // );
     }
@@ -342,13 +374,13 @@ export default class SOAFormCmp extends LightningElement {
         createAccount({ jSONstr: JSON.stringify(jSONstr) })
             .then(response => {
                 const id = response;
+                this.recordId = id;
 
                 console.log("--->Member Account Created successfully---" + JSON.stringify(response));
 
-                const msg = "Successfully created member record for " +
-                    this.inputFieldData['beneficiaryFirstName'] + " " + this.inputFieldData['beneficiaryLastName'] +
-                    " and associated the SOA";
-                this.generatePDF(id, msg);
+                
+                this.createFormDataRecord();
+                // this.generatePDF(id, msg);
 
             })
             .catch(err => {
@@ -366,12 +398,14 @@ export default class SOAFormCmp extends LightningElement {
 
     associateSOA() {
         this.isDupModal = false;
-        console.log("associateSOA---" + this.userSelectedDupID);
+  
+        this.recordId =  this.userSelectedDupID;
+        console.log("AssociateSOA--->" + this.userSelectedDupID + ":::::" +  this.recordId);
         this.isLoading = true;
-        const msg = "Successfully added SOA to " +
-            this.inputFieldData['beneficiaryFirstName'] + " " + this.inputFieldData['beneficiaryLastName'] +
-            " and associated the SOA";
-        this.generatePDF(this.userSelectedDupID, msg);
+        // const msg = "Successfully added SOA to " +
+        //     this.inputFieldData['beneficiaryFirstName'] + " " + this.inputFieldData['beneficiaryLastName'] +
+        //     " and associated the SOA";
+        this.createFormDataRecord();
     }
 
     closeDupModal() {

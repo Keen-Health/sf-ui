@@ -1,60 +1,60 @@
 .main-container{
-background-color: white;
-box-shadow: var(--lwc-shadowDropDown);
-}
-.button-card-style{
-    padding: 0px 0px 0px 0px;
-
-}
-.main-label{
-  font-size: 1.8rem;
-}
-
-.spinner-container{
-    max-height: 100vh;
-}
-
-.slds-modal__container {
-    width: 90%;
-    max-width: 100rem;
-    padding-top: 3rem;
-    padding-bottom: 3rem;
-
-}
-
- 
-
-@media only screen and (max-width: 768px) {
-    /* For mobile phones: */
-    .slds-modal__container{
-        margin-right: 1rem;
-        margin-left: 1rem;
+    background-color: white;
+    box-shadow: var(--lwc-shadowDropDown);
     }
-  }
-
-ul {
-    list-style: disc;
-    list-style-position: inside;
-}
-
-h2 {
-    font-weight: bold;
-}
-
-.disabled-agent-signature{
-    background-color: #ECEBEA;
-    height: 154px;
-    width: 304px;
-    padding: 30px;
-    border: 0.5px solid #bababa;
-    border-radius: 5px;
-    color: #3d3c3c;
-}
-
-ul li{
-    padding-top: 0.5rem;
-}
-/* .checkboxClass .slds-form-element__control{
-    display: flex;
-    flex-direction: column;
-} */
+    .button-card-style{
+        padding: 0px 0px 0px 0px;
+    
+    }
+    .main-label{
+      font-size: 1.8rem;
+    }
+    
+    .spinner-container{
+        max-height: 100vh;
+    }
+    
+    .slds-modal__container {
+        width: 90%;
+        max-width: 100rem;
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    
+    }
+    
+     
+    
+    @media only screen and (max-width: 768px) {
+        /* For mobile phones: */
+        .slds-modal__container{
+            margin-right: 1rem;
+            margin-left: 1rem;
+        }
+      }
+    
+    ul {
+        list-style: disc;
+        list-style-position: inside;
+    }
+    
+    h2 {
+        font-weight: bold;
+    }
+    
+    .disabled-agent-signature{
+        background-color: #ECEBEA;
+        height: 154px;
+        width: 304px;
+        padding: 30px;
+        border: 0.5px solid #bababa;
+        border-radius: 5px;
+        color: #3d3c3c;
+    }
+    
+    ul li{
+        padding-top: 0.5rem;
+    }
+    /* .checkboxClass .slds-form-element__control{
+        display: flex;
+        flex-direction: column;
+    } */
