@@ -1,14 +1,14 @@
 public with sharing class SOAFormPDFController {
-    public String inputJson = 'hello world';
+    // public String inputJson = 'hello world';
   
-    public String jsonRes { get;set; }
-    // public Boolean jsonData = true;
+    // public String jsonRes { get;set; }
+    // // public Boolean jsonData = true;
   
    
-    public static void sendVFData(String jsonRes){
-            jsonRes = 'hello world';
+    // public static void sendVFData(String jsonRes){
+    //         jsonRes = 'hello world';
             
-        }
+    //     }
 
  
 //     public Boolean getInputJson(){
@@ -27,12 +27,32 @@ public with sharing class SOAFormPDFController {
 
    
     // public String jsonRes { get;set; }   
-    // @AuraEnabled
+
     // public static void sendVFData(String jsonStr){
     //     Map < String, Object > jsonRes = new Map<String, Object>();
     //     jsonRes = ( Map<String, Object>)JSON.deserializeUntyped( jsonStr );
 
     // }
+
+    public SOAFormPDFController result {get; set;}
+    public String firstName {get; set;}
+    public String LastName {get; set;}
+    public String inputJson ='';
+    public static SOAFormPDFController deserialize(String Json){
+   // String json = '{"firstName":"Test","LastName":"Lead"}';
+    return (SOAFormPDFController) System.JSON.deserialize(json, SOAFormPDFController.class);
+}
+public void getResult(String json){
+    result = SOAFormPDFController.deserialize(json);
+    system.debug('Result is: '+ result);
+}
+@AuraEnabled
+public static void getData(String json){
+    SOAFormPDFController js = new SOAFormPDFController();
+    js.inputJson = json;
+    js.getResult(json);
+}
+
 
     
     @AuraEnabled

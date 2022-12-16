@@ -50,23 +50,14 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
         // Callback invoked whenever a new event message is received
         const thisReference = this;
         const messageCallback = function (response) {
-
-
-
             var obj = JSON.parse(JSON.stringify(response));
-
-
-
             thisReference.refreshComponent(null);
-
-
             // Response contains the payload of the new message received
         };
 
         // Invoke subscribe method of empApi. Pass reference to messageCallback
         subscribe(thisReference.channelNamePlans, -1, messageCallback).then(response => {
             // Response contains the subscription information on subscribe call
-
             thisReference.subscription = response;
         });
     }
@@ -733,6 +724,25 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
     }
 
     refreshComponent(event) {
+       // Fix for EN-1842, skipping conditional refresh and loading everytime    
+        refreshApex(this.memberPharmacies)
+            .then(() => {
+                this.recordLst = this.memberPharmacies;
+                this.template.querySelector('[data-id="memberPharmacy"]').label = 'Pharmacies (' + this.memberPharmacies.data.length + ')';
+            });
+
+        refreshApex(this.memberMedicationResult)
+            .then(() => {
+                this.recordLst = this.memberMedicationResult;
+                this.template.querySelector('[data-id="medications"]').label = 'Medications (' + this.memberMedicationResult.data.length + ')';
+            });
+
+        refreshApex(this.getMemberPhysicianResult)
+            .then(() => {
+                this.recordLst = this.getMemberPhysicianResult;
+                this.template.querySelector('[data-id="physicians"]').label = 'Physicians (' + this.getMemberPhysicianResult.data.length + ')';
+            });
+        // End of fix for EN-1842    
 
         if (this.showCareGiver) {
             refreshApex(this.careGiverCount);
@@ -745,7 +755,6 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
         }
 
         if (this.showCreatePlan) {
-            // this.showCareGiver = false;
             refreshApex(this.memberPlanResult)
                 .then(() => {
                     this.recordLst = this.memberPlanResult;
@@ -755,7 +764,6 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
         }
 
         if (this.showMemberPractice) {
-            // this.showCareGiver = false;
             refreshApex(this.memberPracticeResult)
                 .then(() => {
                     this.recordLst = this.memberPracticeResult;
@@ -763,18 +771,8 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
                 });
             return;
         }
-
-        if (this.showMemberMedication) {
-            // this.showCareGiver = false;
-            refreshApex(this.memberMedicationResult)
-                .then(() => {
-                    this.recordLst = this.memberMedicationResult;
-                    this.template.querySelector('[data-id="medications"]').label = 'Medications (' + this.memberMedicationResult.data.length + ')';
-                });
-            return;
-        }
+        
         if (this.showMemberHospital) {
-            // this.showCareGiver = false;
             refreshApex(this.getMemberHospitalResult)
                 .then(() => {
                     this.recordLst = this.getMemberHospitalResult;
@@ -783,7 +781,6 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
             return;
         }
         if (this.showMemberCampaign) {
-            // this.showCareGiver = false;
             refreshApex(this.getMemberCampaignResult)
                 .then(() => {
                     this.recordLst = this.getMemberCampaignResult;
@@ -792,18 +789,9 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
             return;
         }
 
-        if (this.showMemberPhysician) {
-            // this.showCareGiver = false;
-            refreshApex(this.getMemberPhysicianResult)
-                .then(() => {
-                    this.recordLst = this.getMemberPhysicianResult;
-                    this.template.querySelector('[data-id="physicians"]').label = 'Physicians (' + this.getMemberPhysicianResult.data.length + ')';
-                });
-            return;
-        }
+        
 
         if (this.showOutboundReferralPractice) {
-            // this.showCareGiver = false;
             refreshApex(this.OutboundReferralPractice)
                 .then(() => {
                     this.recordLst = this.OutboundReferralPractice;
@@ -813,7 +801,6 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
         }
 
         if (this.showOutboundReferralOrg) {
-            // this.showCareGiver = false;
             refreshApex(this.OutboundReferralOrg)
                 .then(() => {
                     this.recordLst = this.OutboundReferralOrg;
@@ -823,7 +810,6 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
         }
 
         if (this.showMembersEvent) {
-            // this.showCareGiver = false;
             refreshApex(this.MembersEvent)
                 .then(() => {
                     this.recordLst = this.MembersEvent;
@@ -831,17 +817,6 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
                 });
             return;
         }
-
-        if (this.showPharmacy) {
-            // this.showCareGiver = false;
-            refreshApex(this.memberPharmacies)
-                .then(() => {
-                    this.recordLst = this.memberPharmacies;
-                    this.template.querySelector('[data-id="memberPharmacy"]').label = 'Pharmacies (' + this.memberPharmacies.data.length + ')';
-                });
-            return;
-        }
-
 
         // eval("$A.get('e.force:refreshView').fire();");
     }

@@ -412,6 +412,7 @@ getAddressdataFromModal(event){
         this.insertNewKeen(this.inpFieldsVal);
     }
     insertNewKeen(fields){
+        fields['is_Manually_Created__c'] = true;
         if(this.phoneDetail!= undefined){
                 fields['PersonAssistantPhone'] = this.phoneDetail['PersonAssistantPhone'];
                 fields['PersonHomePhone'] = this.phoneDetail['PersonHomePhone'];

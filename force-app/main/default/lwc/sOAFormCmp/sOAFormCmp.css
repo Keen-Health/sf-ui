@@ -22,10 +22,7 @@ box-shadow: var(--lwc-shadowDropDown);
 
 }
 
-.title-heading{
-    font-size: 13px;
-    font-weight: 500;
-}
+ 
 
 @media only screen and (max-width: 768px) {
     /* For mobile phones: */
@@ -41,10 +38,23 @@ ul {
 }
 
 h2 {
-    font-size: 14px;
-    font-weight: 500;
+    font-weight: bold;
+}
+
+.disabled-agent-signature{
+    background-color: #ECEBEA;
+    height: 154px;
+    width: 304px;
+    padding: 30px;
+    border: 0.5px solid #bababa;
+    border-radius: 5px;
+    color: #3d3c3c;
 }
 
 ul li{
     padding-top: 0.5rem;
 }
+/* .checkboxClass .slds-form-element__control{
+    display: flex;
+    flex-direction: column;
+} */

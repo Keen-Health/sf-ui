@@ -10,7 +10,8 @@ public with sharing class GenerateQuoteController {
         try{
             keenMemberData.keenMemberAccountMap = new Map<Id,Account>([select Id,AccountNumber,Salutation,
                                                                         FirstName,LastName,DoB__c,
-                                                                        PersonMailingPostalCode,PersonEmail,
+                                                                        PersonMailingPostalCode,PersonEmail,PersonMailingStreet,
+                                                                        PersonMailingCity,
                                                                         Phone,County__c,PrimaryContactFieldName__c,
                                                                         VerifyPagePrimaryContact__c,PersonAssistantPhone,PersonHomePhone,
                                                                         PersonMobilePhone,PersonOtherPhone,
@@ -148,7 +149,7 @@ public with sharing class GenerateQuoteController {
                 MemberPhysicianWrapper mWrapper = new MemberPhysicianWrapper();
                 mWrapper.firstName =cc.Physician_directory__r.First_name__c;
                 mWrapper.lastName = cc.Physician_directory__r.name;
-                mWrapper.name = mWrapper.firstName + ' ' + mWrapper.lastName;
+                mWrapper.name = String.isNotBlank((String)mWrapper.firstName) ? (mWrapper.firstName + ' ' + mWrapper.lastName) : (mWrapper.lastName);
                 mWrapper.specialty = cc.Physician_directory__r.Specialty__c;
                 mWrapper.phone = cc.Physician_directory__r.Phone__c;
                 mWrapper.city = cc.City__c;

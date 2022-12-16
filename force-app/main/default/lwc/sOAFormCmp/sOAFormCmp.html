@@ -57,9 +57,15 @@
             <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12" small-device-size="12"
                 medium-device-size="4">
                 <lightning-input class="fieldvalidate" required label="Member Signature:" name="memberSignature"
-                    max-length="80" onchange={handleChange} value={inputFieldData.memberSignature}>
+                    max-length="80" onchange={handleMemberSignature} value={inputFieldData.memberSignature}>
                 </lightning-input>
             </lightning-layout-item>
+            <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
+            small-device-size="12" medium-device-size="4">
+            <lightning-input class="fieldvalidate" disabled required label="Date:" name="date" type="date"
+                date-style="short" value={formatedDate} onchange={handleChange}>
+            </lightning-input>
+        </lightning-layout-item>
             <!-- <lightning-layout-item class="slds-p-vertical_x-small" size="12" small-device-size="12">
                 <div class="slds-grid slds-wrap">
                     <label class="title-heading slds-p-right_medium">Member Signature:</label>
@@ -82,17 +88,20 @@
                 <h2>To be completed by Agent:</h2>
                 <lightning-layout multiple-rows>
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
-                        small-device-size="12" medium-device-size="4">
-                        <lightning-input disabled class="fieldvalidate" required label="Agent name:" name="agentName"
-                            max-length="80" onchange={handleChange} value={inputFieldData.agentName}>
-                        </lightning-input>
-                    </lightning-layout-item>
-                    <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
-                        small-device-size="12" medium-device-size="4">
-                        <lightning-input class="fieldvalidate" required label="Agent phone:" name="agentPhone"
-                            type="tel" disabled value={inputFieldData.agentPhone} onchange={handleChange}>
-                        </lightning-input>
-                    </lightning-layout-item>
+                    small-device-size="12" medium-device-size="4">
+                    <lightning-input disabled class="fieldvalidate" required label="Agent name:" name="agentName"
+                        max-length="80" onchange={handleChange} value={inputFieldData.agentName}>
+                    </lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
+                    small-device-size="12" medium-device-size="4">
+                    <lightning-input class="fieldvalidate" required label="Agent phone:" name="agentPhone"
+                        type="tel" disabled value={inputFieldData.agentPhone} onchange={handleChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+                </lightning-layout>
+                <lightning-layout multiple-rows>
+                   
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
                         small-device-size="12" medium-device-size="4">
                         <lightning-input class="fieldvalidate" required label="Beneficiary first name:"
@@ -113,16 +122,11 @@
                             pattern="[0-9]{10}$" onchange={handleChange} value={inputFieldData.beneficiaryPhone}>
                         </lightning-input>
                     </lightning-layout-item>
-                    <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
-                        small-device-size="12" medium-device-size="4">
-                        <lightning-input class="fieldvalidate" disabled required label="Date:" name="date" type="date"
-                            date-style="short" value={formatedDate} onchange={handleChange}>
-                        </lightning-input>
-                    </lightning-layout-item>
+              
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
                         small-device-size="12" medium-device-size="4">
                         <lightning-textarea label="Street address:" name="streetAddress" max-length="100"
-                            onchange={handleChange}>
+                            onchange={handleChange} value={inputFieldData.streetAddress}>
                         </lightning-textarea>
                     </lightning-layout-item>
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
@@ -133,13 +137,15 @@
                     </lightning-layout-item>
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
                         small-device-size="12" medium-device-size="4">
-                        <lightning-input label="City:" name="city" max-length="40" onchange={handleChange}>
+                        <lightning-input label="City:" name="city" max-length="40" onchange={handleChange}
+                            value={inputFieldData.city}>
                         </lightning-input>
                     </lightning-layout-item>
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
                         small-device-size="12" medium-device-size="4">
                         <lightning-input label="ZIP code:" type="tel" pattern="[0-9]{5}$" max-length="5" name="zipCode"
-                            message-when-pattern-mismatch="Please enter a valid zip code" onchange={handleChange}>
+                            message-when-pattern-mismatch="Please enter a valid zip code" onchange={handleChange}
+                            value={inputFieldData.zipCode}>
                         </lightning-input>
                     </lightning-layout-item>
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
@@ -162,20 +168,32 @@
                         </p>
                         <lightning-combobox class="fieldvalidate" required name="methodOfContact" variant="label-hidden"
                             value={inputFieldData.intialMethodOfContact} placeholder="Select Method"
-                            options={methodOfContactOptions} onchange={handleIntialMethodOfContact}></lightning-combobox>
-                            <lightning-input if:true={showOtherInputBox} class="fieldvalidate" required label="Other" name="otherMethodOfContactOptions" max-length="100" onchange={handleChange}
-                    value={inputFieldData.otherMethodOfContactOptions}></lightning-input>
+                            options={methodOfContactOptions}
+                            onchange={handleIntialMethodOfContact}></lightning-combobox>
+                        <lightning-input if:true={showOtherInputBox} class="fieldvalidate" required
+                            label="Initial method of contact: Other" name="otherMethodOfContactOptions" max-length="100"
+                            onchange={handleChange}
+                            value={inputFieldData.otherMethodOfContactOptions}></lightning-input>
                     </lightning-layout-item>
                     <lightning-layout-item class="slds-p-vertical_x-small" size="12" small-device-size="12">
                         <div class="slds-grid slds-wrap">
                             <label class="slds-p-right_medium">Agent's Signature:</label>
-                            <lightning-layout-item class="slds-p-vertical_x-small">
+                            <lightning-layout-item if:false={isAgentSignatureDisabled} class="slds-p-vertical_x-small">
                                 <c-signature-Panel onprogressvaluechange={handleAgentValueChange} id="signatureAgent">
                                 </c-signature-Panel>
                                 <p class="slds-required slds-size_4-of-4" if:true={agentSignRequired}>Please sign and
                                     submit.</p>
                                 <button class="slds-button slds-button_brand slds-m-top_x-small"
                                     onclick={clearSignature}>Clear Signature</button>
+                            </lightning-layout-item>
+                            <lightning-layout-item if:true={isAgentSignatureDisabled}>
+                                <div class="slds-align_absolute-center"><b><span title="required"
+                                            class="slds-required">*</span>Signature</b></div>
+                                <div class="disabled-agent-signature slds-m-top_x-small">
+                                    <p>
+                                        This is a Test Message which should be updated in future
+                                    </p>
+                                </div>
                             </lightning-layout-item>
                         </div>
                     </lightning-layout-item>
@@ -205,10 +223,10 @@
             </lightning-layout-item>
             <lightning-layout-item class="slds-p-vertical_x-small" size="12" small-device-size="12">
                 <h2>Plan Use Only</h2>
-                
+
                 <lightning-input class="fieldvalidate slds-p-top_small" label="Agent, if the form was signed by the beneficiary at the time of appointment, provide
-                explanation why SOA was not documented prior to meeting:" name="explanation" max-length="250" onchange={handleChange}
-                    value={inputFieldData.explanation}>
+                explanation why SOA was not documented prior to meeting:" name="explanation" max-length="250"
+                    onchange={handleChange} value={inputFieldData.explanation}>
                 </lightning-input>
                 <div class="slds-p-top_small">
                     <p class="slds-align_absolute-center">
