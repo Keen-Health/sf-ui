@@ -697,7 +697,7 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
                 }
                 data = {
                     'name': pharm,
-                    'mailOrder': mailOrder.toLowerCase() == 'yes' ? 'y' : 'n'
+                    'mailorder': mailOrder.toLowerCase() == 'yes' ? 'y' : 'n'
                 };
                 break;
             }
