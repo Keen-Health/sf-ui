@@ -35,6 +35,8 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     disableAssociateSOABtn = true;
     agentSignRequired = false;
     isAgentSignatureDisabled = true;
+    isLoading = false;
+    formatedDate = "";
     dupColumns = [
         {
             label: 'Name', fieldName: 'nameUrl', type: 'url',
@@ -44,11 +46,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         { label: 'Phone', fieldName: 'Phone', type: 'Phone' },
         { label: 'Email', fieldName: 'PersonEmail', type: 'email' },
     ];
-    isLoading = false;
-    todaysDate = new Date();
-    formatedDate = this.todaysDate.getFullYear() + '-' + (this.todaysDate.getMonth() + 1) + '-' + this.todaysDate.getDate ();
 
-   
 
     @track inputFieldData = {
         "typeOfProducts": [],
@@ -74,8 +72,6 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
     };
 
-    
-    // isModalOpen = false;
     productType = [];
     memberSignCaptured = false;
     agentSignCaptured = false;
@@ -147,6 +143,11 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         }
     };
 
+    updateDateField(){
+        const todaysDate = new Date();
+        this.formatedDate = todaysDate.getFullYear() + '-' + (todaysDate.getMonth() + 1) + '-' + todaysDate.getDate ();    
+    }
+ 
     validVariable(variable) {
         if (variable === null || variable === "" || variable === undefined) {
             return false
@@ -228,8 +229,13 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
     handleMemberSignature(event) {
         const value = event.target.value;
-        this.isAgentSignatureDisabled = value != "" ? false : true;
-
+        if(value != ""){
+            this.isAgentSignatureDisabled = false;
+            this.updateDateField()
+        }else{
+            this.isAgentSignatureDisabled = true;
+             this.formatedDate = "";
+        }
     }
 
     handleCheckValidation() {
