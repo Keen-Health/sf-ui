@@ -1,4 +1,27 @@
 public with sharing class SOAFormPDFController {
+
+
+
+    
+    public List<soaWrapper> soaFormList = new List<soaWrapper>();
+    List<SOAForm__c> soaFormDataList = new List<SOAForm__c>();
+    public static String ID = '';
+    public List<soaWrapper> getSoaData(){
+        system.debug('>>>>>>> ID is: '+ ID);
+        soaFormDataList = [SELECT ID,Beneficiary_first_name__c,
+                                   Beneficiary_last_name__c
+                                   FROM SOAForm__c WHERE Id='a0s8B00000010QiQAI'];
+        soaFormList.add(new soaWrapper(soaFormDataList[0].Beneficiary_first_name__c,soaFormDataList[0].Beneficiary_last_name__c)); 
+        return soaFormList;  
+    }      
+    public class soaWrapper{
+       public String beneficiaryFirstName {get; set;}
+       public String beneficiaryLastName {get; set;}
+       public soaWrapper(String beneficiaryFirstName, String beneficiaryLastName){
+            this.beneficiaryFirstName = beneficiaryFirstName;
+            this.beneficiaryLastName = beneficiaryLastName;
+        }
+    }
     
     @AuraEnabled
     public static void savePDFToSF(String accoundId){
@@ -8,7 +31,16 @@ public with sharing class SOAFormPDFController {
         PageReference pref = page.SOAPdfGenerate;
         pref.getParameters().put('id',acc.Id);
         pref.setRedirect(true);
-        Blob bdata = pref.getContent();
+        // Blob bdata;
+        // if(!test.isRunningTest()){
+        //     bdata = pref.getContent();
+        // }else{
+        //     bdata=blob.valueOf('TestString');
+        // }
+        Blob bdata;
+        try {
+            bdata = pref.getContent();
+        }  
         //Create Document
          ContentVersion cv = new ContentVersion();
          cv.ContentLocation = 'S'; 

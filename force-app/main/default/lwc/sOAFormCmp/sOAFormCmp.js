@@ -1,8 +1,8 @@
 import { api, LightningElement, track, wire } from 'lwc';
 import { NavigationMixin } from "lightning/navigation";
-import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { CurrentPageReference } from 'lightning/navigation';
+
 
 import createAccount from '@salesforce/apex/SOAFormController.createAccount';
 import createSOARecord from '@salesforce/apex/SOAFormController.createSOARecord';
@@ -21,7 +21,8 @@ import getPickListValues from '@salesforce/apex/PickListController.getPickListVa
 export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
 
-    recordId = undefined;
+    // recordId = '0018B00000JcXjUQAV';
+    @api recordId;
     fromHomePage = true;
     agentInfo;
     memberInfo;
@@ -103,28 +104,42 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
     };
 
-    @wire(CurrentPageReference)
-    getStateParameters(currentPageReference) {
-        console.log("--->getStateParameters" + JSON.stringify(currentPageReference));
 
-        this.recordId = currentPageReference.state?.recordId;
-        console.log("---> getStateParameters  recordId : " + this.recordId);
-        this.fromHomePage = this.recordId == "undefined" ||  this.recordId == undefined ? true : false;
-        console.log("---> fromHomePage: " + this.fromHomePage );
-        if (this.recordId != undefined) {
-            getAccountInfo({ accountId: this.recordId }).then(memberData => {
-                if (memberData != undefined) {
-                    let keenMemberAccData = JSON.parse(JSON.stringify(memberData.keenMemberAccountMap));
-                    for (var key in keenMemberAccData) {
-                        this.memberInfo = keenMemberAccData[key];
-                    }
-                    this.setDataToLocalObj();
-                    console.log("Member Info--->" + JSON.stringify(this.memberInfo))
-                };
-            });
+    // @wire(getAccountInfo, { accountId: this.recordId })
+    // wiredMemberData({ error, data }) {
+    //     if (this.validVariable(data)) {
+    //                         console.log("Member Info :data" + data);
+    //                         // let keenMemberAccData = JSON.parse(JSON.stringify(memberData.keenMemberAccountMap));
+    //                         // for (var key in keenMemberAccData) {
+    //                         //     this.memberInfo = keenMemberAccData[key];
+    //                         // }
+    //                         // this.setDataToLocalObj();
+    //                         // console.log("Member Info--->" + JSON.stringify(this.memberInfo))
+    //                     };
+    // }
 
-        }
-    }
+    // @wire(CurrentPageReference)
+    // getStateParameters(currentPageReference) {
+    //     console.log("--->getStateParameters" + JSON.stringify(currentPageReference));
+
+    //     this.recordId = currentPageReference.state?.recordId;
+    //     console.log("---> getStateParameters  recordId : " + this.recordId);
+    //     this.fromHomePage = this.recordId == "undefined" ||  this.recordId == undefined ? true : false;
+    //     console.log("---> fromHomePage: " + this.fromHomePage );
+    //     if (this.recordId != undefined) {
+    //         getAccountInfo({ accountId: this.recordId }).then(memberData => {
+    //             if (memberData != undefined) {
+    //                 let keenMemberAccData = JSON.parse(JSON.stringify(memberData.keenMemberAccountMap));
+    //                 for (var key in keenMemberAccData) {
+    //                     this.memberInfo = keenMemberAccData[key];
+    //                 }
+    //                 this.setDataToLocalObj();
+    //                 console.log("Member Info--->" + JSON.stringify(this.memberInfo))
+    //             };
+    //         });
+
+    //     }
+    // }
 
 
     @wire(getPickListValues, { objectName: 'Account', selectedField: 'Carrier_list__c' })
@@ -142,6 +157,24 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
             this.stateList = data;
         }
     };
+
+
+    connectedCallback(){
+        this.fromHomePage = this.recordId == "undefined" ||  this.recordId == undefined ? true : false;
+        if(this.validVariable(this.recordId)){
+            getAccountInfo({ accountId: this.recordId }).then(memberData => {
+                            if (memberData != undefined) {
+                                let keenMemberAccData = JSON.parse(JSON.stringify(memberData.keenMemberAccountMap));
+                                for (var key in keenMemberAccData) {
+                                    this.memberInfo = keenMemberAccData[key];
+                                }
+                                this.setDataToLocalObj();
+                                console.log("Member Info--->" + JSON.stringify(this.memberInfo))
+                            };
+                        });
+            
+        }
+    }
 
     updateDateField(){
         const todaysDate = new Date();
@@ -249,7 +282,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         });
 
         if (!this.inputFieldData['agentSignatureStatus']) {
-            this.clearSignature();
+            // this.clearSignature();
             this.agentSignRequired = true;
         } else {
             this.agentSignRequired = false;
@@ -271,11 +304,15 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
     }
 
+    getAgentSignature(){
+        const objChild1 = this.template.querySelector('c-signature-Panel');
+        this.inputFieldData['agentSignatureURL'] = JSON.stringify(objChild1.getImageURL());
+
+    }
+
     submitDetails() {
         console.log("----------> ONSUBMIT <------------");
 
-        const objChild1 = this.template.querySelector('c-signature-Panel');
-        this.inputFieldData['agentSignatureURL'] = JSON.stringify(objChild1.getImageURL());
 
         // console.log("Agent Signature Image Url--->" + JSON.stringify(objChild1.getImageURL()));
 
@@ -283,6 +320,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
         console.log("FromHomePage--->" + this.fromHomePage);
         if (isValid && this.fromHomePage) {
+            this.getAgentSignature();
             this.isLoading = true;
             getMatchedAccounts({
                 firstName: this.inputFieldData['beneficiaryFirstName'],
@@ -298,6 +336,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
                 console.error("^^^^MatchedAccountList Error:" + JSON.stringify(err));
             })
         } else if (isValid && !this.fromHomePage) {
+            this.getAgentSignature();
             console.log("^^^^Existing Account^^^^");
             this.isLoading = true;
             this.createFormDataRecord();
@@ -325,7 +364,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
           // {soaRecordId : responseSOAId}
           fetchSOAForminputData({soaRecordId : responseSOAId}).then(res =>{
             console.log("fetchSOAForminputData Sucessful response" + JSON.stringify(res));
-            this.generatePDF();
+            // this.generatePDF();
           }).catch(err =>{console.log("fetchSOAForminputData Error: " + JSON.stringify(err))});
        
         }).catch((err) =>{console.log("createSOARecord Error "+ JSON.stringify(err))});
@@ -431,6 +470,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     };
 
     showErrorToast(message) {
+        console.log("in the function" + message);
         const evt = new ShowToastEvent({
             title: 'Error!',
             message: message,
@@ -466,7 +506,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     get plansByAgent() {
         return [
             { label: 'All carriers', value: 'all_carriers' },
-            { label: 'List from the carriers picklist', value: 'list_from_carriers' },
+            { label: 'Choose from the list of carriers', value: 'list_of_carriers' },
         ];
     }
 

@@ -1,0 +1,17 @@
+<apex:page showHeader="false" sidebar="false">
+    <apex:includeLightning />    
+    <div id="LightningComponentid" />    
+    <script>
+    var recordId = "{!$CurrentPage.parameters.recordId}";
+    $Lightning.use("c:SOAFormApp", function() {
+        $Lightning.createComponent("c:sOAFormCmp",
+          { 
+            "recordId": recordId
+          },
+          "LightningComponentid",
+          function(cmp) {
+             console.log('LWC Componenet added in VF page');
+          });
+    });
+    </script>
+</apex:page>

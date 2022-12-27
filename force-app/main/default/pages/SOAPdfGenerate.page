@@ -3,8 +3,8 @@ applyHtmlTag="true" showHeader="false" cache="true" readOnly="true">
 <!-- Begin Default Content REMOVE THIS -->
 
 <h1>Scope of Sales Appointment Confirmation Form</h1>
-<p>{!beneficiaryFirstName}</p>
-<p>beneficiaryFirstName : {!beneficiaryFirstName}</p> 
+<p>{!SoaData}</p>
+<!-- <p>beneficiaryFirstName : {!SoaData.Beneficiary_first_name__c}</p>  -->
  
  
 <!-- <apex:outputText>{!jsonData}</apex:outputText>

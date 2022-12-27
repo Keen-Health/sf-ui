@@ -1,23 +1,20 @@
 public with sharing class SOAFormController {
 
 
-    public static String beneficiaryFirstName {get; set;}
-    // public String soaRecordId;
 
+    // public String beneficiaryFirstName;
 
-
-
-    // 
-    // public static void fetchSOAFormData(){
-    //     SOAFormController sfc = new SOAFormController();
-    //     sfc.soaRecordId = 'a0s8B0000000xgXQAQ';
-    //     sfc.fetchSOAForminputData('a0s8B0000000xgXQAQ');
-    // }
     @AuraEnabled
     public static void fetchSOAForminputData(String soaRecordId){
         SOAForm__c soaFormData = [SELECT ID,Beneficiary_first_name__c, Beneficiary_last_name__c FROM SOAForm__c WHERE Id=: soaRecordId];
-       beneficiaryFirstName = soaFormData.Beneficiary_first_name__c;
+    //    beneficiaryFirstName = soaFormData.Beneficiary_first_name__c;
     }
+
+ 
+    // public String getBeneficiaryFirstName(){
+    //     beneficiaryFirstName = 'Test';
+    //     return beneficiaryFirstName;
+    // }
     
     @AuraEnabled
     public static Id createSOARecord(String inputJson){
