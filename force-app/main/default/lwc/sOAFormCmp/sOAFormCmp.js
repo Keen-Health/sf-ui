@@ -6,10 +6,10 @@ import { CurrentPageReference } from 'lightning/navigation';
 
 import createAccount from '@salesforce/apex/SOAFormController.createAccount';
 import createSOARecord from '@salesforce/apex/SOAFormController.createSOARecord';
-import fetchSOAForminputData from '@salesforce/apex/SOAFormController.fetchSOAForminputData';
+import fetchSOAForminputData from '@salesforce/apex/SOAFormPDFController.fetchSOAForminputData';
 import getMatchedAccounts from '@salesforce/apex/SOAFormController.matchedAccounts';
 
-import savePDFToSF from '@salesforce/apex/SOAFormPDFController.savePDFToSF';
+import savePDFToSF from '@salesforce/apex/SOAFormController.savePDFToSF';
 
 import getAccountInfo from '@salesforce/apex/GenerateQuoteController.getKeenMembersData';
 import getAgentData from '@salesforce/apex/GenerateQuoteController.getAgentData';
@@ -144,7 +144,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
     @wire(getPickListValues, { objectName: 'Account', selectedField: 'Carrier_list__c' })
     wiredCarrierList({ error, data }) {
-        console.log("Carrier_list__c--->" + JSON.stringify(data));
+        // console.log("Carrier_list__c--->" + JSON.stringify(data));
         if (this.validVariable(data)) {
             this.carrierList = data;
         }
@@ -152,7 +152,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
     @wire(getPickListValues, { objectName: 'Account', selectedField: 'StatePicklist__c' })
     wiredStateList({ error, data }) {
-        console.log("StatePicklist__c--->" + JSON.stringify(data));
+        // console.log("StatePicklist__c--->" + JSON.stringify(data));
         if (this.validVariable(data)) {
             this.stateList = data;
         }
@@ -160,16 +160,18 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
 
     connectedCallback(){
-        this.fromHomePage = this.recordId == "undefined" ||  this.recordId == undefined ? true : false;
-        if(this.validVariable(this.recordId)){
+        console.log("this.recordId " + typeof this.recordId);
+        this.fromHomePage = this.recordId == 'undefined' ||  this.recordId == undefined ? true : false;
+        console.log("this.fromHomePage --->>" +this.fromHomePage );
+        if(!this.fromHomePage){
             getAccountInfo({ accountId: this.recordId }).then(memberData => {
                             if (memberData != undefined) {
                                 let keenMemberAccData = JSON.parse(JSON.stringify(memberData.keenMemberAccountMap));
                                 for (var key in keenMemberAccData) {
                                     this.memberInfo = keenMemberAccData[key];
                                 }
-                                this.setDataToLocalObj();
                                 console.log("Member Info--->" + JSON.stringify(this.memberInfo))
+                                this.setDataToLocalObj();
                             };
                         });
             
@@ -311,6 +313,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     }
 
     submitDetails() {
+       console.log("content" + JSON.stringify( this.template.querySelector('.main-container').innerHTML));
         console.log("----------> ONSUBMIT <------------");
 
 
@@ -364,7 +367,8 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
           // {soaRecordId : responseSOAId}
           fetchSOAForminputData({soaRecordId : responseSOAId}).then(res =>{
             console.log("fetchSOAForminputData Sucessful response" + JSON.stringify(res));
-            // this.generatePDF();
+            setTimeout(()=>{ this.generatePDF();}, 3000);
+           
           }).catch(err =>{console.log("fetchSOAForminputData Error: " + JSON.stringify(err))});
        
         }).catch((err) =>{console.log("createSOARecord Error "+ JSON.stringify(err))});
@@ -377,7 +381,8 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
             console.log("---->>> PDF SAVED--ID:" + id);
             const msg = this.fromHomePage ? this.toastMesssages['newAccount'] : this.toastMesssages['existingAccount'];
             this.showSuccessToast(msg);
-            this.goToMemberPage();
+            this.isLoading = false;
+            // this.goToMemberPage();
  
         }).catch(error => { 
             console.error("savePDFToSFEE Error-->" + JSON.stringify(error)) 

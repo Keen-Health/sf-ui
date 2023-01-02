@@ -59,6 +59,7 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
     showListMessagesModal = false;
     primaryContactErrMsg = '';
     updatedPhoneNumbers = {};
+    hasErrors = false;
 
     //********************** */
     subscription = {};
@@ -228,6 +229,7 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
         });
         this.member = {};
         this.member['priority'] = [];
+        this.hasErrors = false;
     }
 
     @wire(getSunFireStatus, { recId: '$recordId' })
@@ -338,6 +340,7 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
 
 
     isDataValid() {
+        this.hasErrors = false;
         let isValid = { mediPharm: true, fieldValid: true, pharmacies: true, primaryContact: true };
         this.resetValidationErrors();
         let inputFields = this.template.querySelectorAll('.fieldvalidate');
@@ -359,32 +362,38 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
         if (this.isMedicationsAvailable && !this.isPharmaciesAvailable) {
             isValid['mediPharm'] = false;
             this.validationErrors['mediPharm'] = true;
+            this.hasErrors = true;
         }
 
         if (!this.validationErrors['mediPharm'] && this.getMemberData('pharmaciesForSF').length === 0 && this.member['isPharmaciesRequired'] === 'y') {
             isValid['pharmacies'] = false;
             this.validationErrors['pharmacies'] = true;
+            this.hasErrors = true;
         }
 
         if (this.getMemberData('medicationsForSF').length === 0 && this.member['isMedicationsRequired'] === 'y') {
             isValid['medications'] = false;
             this.validationErrors['medications'] = true;
+            this.hasErrors = true;
         }
 
         if (this.getMemberData('physiciansForSF').length === 0 && this.member['isPhysiciansRequired'] === 'y') {
             isValid['physicians'] = false;
             this.validationErrors['physicians'] = true;
+            this.hasErrors = true;
         }
 
         if (this.getMemberData('primaryContact') == 'email' && this.getMemberData('email') == '') {
             this.validationErrors['primaryContact'] = true;
             this.primaryContactErrMsg = 'Email';
+            this.hasErrors = true;
         }
 
         if ((this.getMemberData('primaryContact') == 'phone' || this.getMemberData('primaryContact') == 'text')
             && this.getMemberData('phone') == '') {
             this.validationErrors['primaryContact'] = true;
             this.primaryContactErrMsg = 'Phone number';
+            this.hasErrors = true;
         }
 
 
@@ -398,9 +407,9 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
         const isValid = this.isDataValid();
         let validator = true;
         Object.values(isValid).forEach(val => validator = val && validator);
-        if (validator) {
+        if (validator && !this.hasErrors) { //as per @EN-1728
             this.saveDataToSF();
-        } else if (!isValid.fieldValid) {
+        } else {    //if (!isValid.fieldValid)
             this.showErrorToast('Please fix the error(s) before initiating the data transfer to Sunfire.');
         }
     }
@@ -457,6 +466,7 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
 
     generateQuote() {
         let req = this.getSunfireRequestObject();
+        //console.log('SunfireRequestObject: '+JSON.stringify(req));
         postCallout({ inputJson: JSON.stringify(req) }).then((response) => {
 
         }).catch((error) => {
@@ -682,6 +692,7 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
                     If none of the pharmacies are marked as primary, send the most recent associated pharmacy.
                 */
                 let pharm = "";
+                let mailOrder = "";
                 if (this.member['pharmacies'] && this.member['pharmacies'].length > 0) {
                     this.member['pharmacies'].forEach(element => {
                         if (element.isPharmacyPrimary) {
@@ -690,9 +701,13 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
                     });
                     if (!pharm) {
                         pharm = this.member['pharmacies'][0]['name'];
+                        mailOrder = this.member['pharmacies'][0]['mailOrder'];
                     }
                 }
-                data = pharm;
+                data = {
+                    'name': pharm,
+                    'mailorder': mailOrder.toLowerCase() == 'yes' ? 'y' : 'n'
+                };
                 break;
             }
             case 'pharmaciesForSF': {

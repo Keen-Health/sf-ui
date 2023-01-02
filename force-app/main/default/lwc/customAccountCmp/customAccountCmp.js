@@ -1,10 +1,6 @@
 import { LightningElement, api, wire, track } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
-import { getRecord, getFieldValue, getRecordNotifyChange } from 'lightning/uiRecordApi';
-import LightningConfirm from 'lightning/confirm';
-
+import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-
 import NAME_FIELD from '@salesforce/schema/Account.Name';
 import PTC_Source from '@salesforce/schema/Account.Permission_to_contact_source__c';
 import PRIMARYCONTACT_FIELD from '@salesforce/schema/Account.PrimaryContactFieldName__c';
@@ -16,8 +12,6 @@ import PERSONOTHER from '@salesforce/schema/Account.PersonOtherPhone';
 import OWNER_FIELD from '@salesforce/schema/Account.Owner.Name';
 import PERSON_MAILING_STREET from '@salesforce/schema/Account.PersonMailingStreet';
 import ACCOUNT_SOURCE from '@salesforce/schema/Account.AccountSource';
-
-
 
 const fields = [NAME_FIELD, PRIMARYCONTACT_FIELD, OWNER_FIELD, PERSONASSISTANTPHONE, PERSONHOMEPHONE, PERSONMOBILE, PERSONOTHER, PHONE_FIELD, PERSON_MAILING_STREET, ACCOUNT_SOURCE, PTC_Source];
 export default class DualRecordForm extends LightningElement {
@@ -51,8 +45,6 @@ export default class DualRecordForm extends LightningElement {
     
     showListMessagesModal = false;
     isPhoneChanged;
-
-
 
     @wire(getRecord, { recordId: '$recordId', fields })
     account;
@@ -90,32 +82,24 @@ export default class DualRecordForm extends LightningElement {
         this.isPTCModalOpen = false;
         this.isMedModalOpen = false;
         this.isOtherModalOpen = false;
-        
     }
 
     handlePhoneClick(event) {
 
-  console.log("----------->tempPhDetail['PrimaryContactFieldName__c']" + JSON.stringify(this.phoneDetail) );
-        
-   if(this.showEditField == true) {
-    let tempPhDetail  = JSON.parse(JSON.stringify(this.phoneDetail)); 
-        if(this.template.querySelector("lightning-input-field[data-id=phn]").value != tempPhDetail[this.phoneDetail['PrimaryContactFieldName__c']] || tempPhDetail['PrimaryContactFieldName__c']== null){
-            this.primeContact = 'PersonHomePhone' ;
+        if(this.showEditField == true) {
+            let tempPhDetail  = JSON.parse(JSON.stringify(this.phoneDetail)); 
+            if(this.template.querySelector("lightning-input-field[data-id=phn]").value != tempPhDetail[this.phoneDetail['PrimaryContactFieldName__c']] || tempPhDetail['PrimaryContactFieldName__c']== null) {
+                this.primeContact = 'PersonHomePhone' ;
                 //tempPhDetail['PrimaryContactFieldName__c'] =  'PersonHomePhone' ;
-            tempPhDetail['Phone']=  this.template.querySelector("lightning-input-field[data-id=phn]").value;
-            tempPhDetail['PersonHomePhone'] =  this.template.querySelector("lightning-input-field[data-id=phn]").value;
+                tempPhDetail['Phone']=  this.template.querySelector("lightning-input-field[data-id=phn]").value;
+                tempPhDetail['PersonHomePhone'] =  this.template.querySelector("lightning-input-field[data-id=phn]").value;
+            } else {
+                this.primeContact = this.phoneDetail['PrimaryContactFieldName__c'] ;
             }
-        else{
-        this.primeContact = this.phoneDetail['PrimaryContactFieldName__c'] ;
-            }
-
             this.phoneDetail = tempPhDetail;
-
         }
         else {
-
             let temp = JSON.parse(JSON.stringify(this.account.data.fields));
-    
             for (const key in temp) {
                 temp[key] = temp[key].value;
             }
@@ -123,106 +107,109 @@ export default class DualRecordForm extends LightningElement {
             if(this.phoneDetail['PrimaryContactFieldName__c'] == null){
                 this.phoneDetail['PrimaryContactFieldName__c'] = 'PersonHomePhone';
             }
-            
-
         }
-
-        
-
-        console.log("----------->tempPhDetail['PrimaryContactFieldName__c']" + JSON.stringify(this.phoneDetail) );
         this.isModalOpen = true;
     }
+
     changePhoneNumber(event) {
         this.isPhoneChanged = true;
     }
 
     handleAddressClick(event) {
-        
-
         this.isAddressModalOpen = true;
     }
+
     handlePTCClick(event) {
         this.isPTCModalOpen = true;
     }
+
     handleStatusClick(event) {
         if(event.target.value.includes("Archive"))
             this.isArchiveModalOpen = true;
     }
-    handleMedDetailClick(event) {
 
+    handleMedDetailClick(event) {
         this.isMedModalOpen = true;
     }
 
     handleOtherDetailClick(event) {
-
         this.isOtherModalOpen = true;
     }
-    handleFieldClick(event) {
 
-        
-        
-    
-        if(event.target.fieldName=="Phone")
-      {
+    handleFieldClick(event) {
+        if(event.target.fieldName=="Phone") {
             this.isModalOpen = true;
         }
-    if(event.target.fieldName=="Status__c" )
-    {
+        if(event.target.fieldName=="Status__c" ) {
             this.isArchiveModalOpen = true;
         }
     }
+
     handleSourceClick(event) {
         if(this.showEditField == true)
             this.sourcePickValue = this.template.querySelector("lightning-input-field[data-id=source]").value;
         else
             this.sourcePickValue = this.account.data.fields["AccountSource"].value;
 
-        if(this.sourcePickValue.includes("Aledade") || this.sourcePickValue.includes("Archwell") || this.sourcePickValue.includes("ChenM_Ded_Call center") || this.sourcePickValue.includes("ChenM / Ded MCG") || this.sourcePickValue.includes("Homeward") || this.sourcePickValue.includes("IORA")  ){
+        if(this.sourcePickValue.includes("Aledade") || this.sourcePickValue.includes("Archwell") 
+            || this.sourcePickValue.includes("ChenM_Ded_Call center") || this.sourcePickValue.includes("ChenM / Ded MCG") 
+            || this.sourcePickValue.includes("Homeward") || this.sourcePickValue.includes("IORA")  ) {
+
             this.sourceOtherProviders = true;
             this.isSourceModalOpen = true;
         }
-        if(this.sourcePickValue.includes("Community") || this.sourcePickValue.includes("Provider") || this.sourcePickValue.includes("Referral") || this.sourcePickValue.includes("Event") ||  this.sourcePickValue.includes("Campaign")) 
+        if(this.sourcePickValue.includes("Community") || this.sourcePickValue.includes("Provider") 
+            || this.sourcePickValue.includes("Referral") || this.sourcePickValue.includes("Event") 
+            || this.sourcePickValue.includes("Campaign")) {
+
             this.isSourceModalOpen = true;
-
-
+        }
     }
+
     handleSourceChange(event) {
         this.sourcePickValue = event.target.value;
-        if(this.sourcePickValue.includes("Aledade") || this.sourcePickValue.includes("Archwell") || this.sourcePickValue.includes("ChenM_Ded_Call center") || this.sourcePickValue.includes("ChenM / Ded MCG") || this.sourcePickValue.includes("Homeward") || this.sourcePickValue.includes("IORA")  ){
+        if(this.sourcePickValue.includes("Aledade") || this.sourcePickValue.includes("Archwell") 
+            || this.sourcePickValue.includes("ChenM_Ded_Call center") || this.sourcePickValue.includes("ChenM / Ded MCG") 
+            || this.sourcePickValue.includes("Homeward") || this.sourcePickValue.includes("IORA")) {
+
             this.sourceOtherProviders = true;
             this.isSourceModalOpen = true;
         }
-        if(this.sourcePickValue.includes("Community") || this.sourcePickValue.includes("Provider") || this.sourcePickValue.includes("Referral") || this.sourcePickValue.includes("Event") ||  this.sourcePickValue.includes("Campaign")) 
-            this.isSourceModalOpen = true;
-    }
-    handleFieldChange(event) {
 
-        if(event.target.fieldName=="Status__c" && event.target.value == "Keen Archive")
-        {
+        if(this.sourcePickValue.includes("Community") || this.sourcePickValue.includes("Provider") 
+            || this.sourcePickValue.includes("Referral") || this.sourcePickValue.includes("Event") 
+            || this.sourcePickValue.includes("Campaign")) {
+
+                this.isSourceModalOpen = true;
+            }
+    }
+
+    handleFieldChange(event) {
+        if(event.target.fieldName=="Status__c" && event.target.value == "Keen Archive") {
             this.isArchiveModalOpen = true;
         }
-        if(event.target.fieldName=="AccountSource")
-        {
-            
-      
+
+        if(event.target.fieldName=="AccountSource") {
             this.sourcePickValue = event.target.value;
-          if(this.sourcePickValue.includes("Community") || this.sourcePickValue.includes("Provider") || this.sourcePickValue.includes("Referral") || this.sourcePickValue.includes("Event") || this.sourcePickValue.includes("Phreesia"))
+            
+            if(this.sourcePickValue.includes("Community") || this.sourcePickValue.includes("Provider") 
+            || this.sourcePickValue.includes("Referral") || this.sourcePickValue.includes("Event") 
+            || this.sourcePickValue.includes("Phreesia")) {
+
                 this.isSourceModalOpen = true;
+            }
         }
 
-        if(event.target.fieldName=="Permission_to_contact_date__c" )
-        {
-
+        if(event.target.fieldName=="Permission_to_contact_date__c" ) {
             this.isPTCModalOpen = true;
         }
-
     }
 
     validVariable(variable) {
         if (variable === null || variable === "" || variable === undefined) {
-            return false
+            return false;
         }
-        return true
+        return true;
     }
 
     customValidations(fields) {
@@ -268,12 +255,13 @@ export default class DualRecordForm extends LightningElement {
             isAllValid = false;
             this.listMessagesModalData.body[2]['show'] = true;
         } else if (this.ptcDetail != undefined && this.validVariable(this.ptcDetail['Permission_to_contact_source__c']) 
-        && !(this.validVariable(phoneNumber) || this.validVariable(emailId))) {
+            && !(this.validVariable(phoneNumber) || this.validVariable(emailId))) {
+
             isAllValid = false;
             this.listMessagesModalData.body[2]['show'] = true;
         }
 
-            isAllValid ? this.saveData(fields) : this.showListMessagesModal = true;
+        isAllValid ? this.saveData(fields) : this.showListMessagesModal = true;
     }
 
     saveData(fields){
@@ -283,34 +271,32 @@ export default class DualRecordForm extends LightningElement {
     updatePhoneNumberFromPhoneField(){
         const phnFieldValue = this.template.querySelector("lightning-input-field[data-id=phn]").value
         const primaryPhone = this.phoneDetail['PrimaryContactFieldName__c'];
-        if( !this.validVariable(primaryPhone) &&  this.phoneDetail[primaryPhone] == undefined ){
+        if(!this.validVariable(primaryPhone) &&  this.phoneDetail[primaryPhone] == undefined) {
             this.phoneDetail['Phone'] = phnFieldValue;
             this.phoneDetail['PrimaryContactFieldName__c'] = 'PersonHomePhone';
             this.phoneDetail['PersonHomePhone'] = phnFieldValue;
-        }else if(this.validVariable(primaryPhone) && !this.validVariable(this.phoneDetail[primaryPhone])){
+        } else if(this.validVariable(primaryPhone) && !this.validVariable(this.phoneDetail[primaryPhone])) {
             this.phoneDetail['PrimaryContactFieldName__c'] = 'PersonHomePhone';
-            if(this.validVariable(this.phoneDetail['PersonHomePhone'])){
+            if(this.validVariable(this.phoneDetail['PersonHomePhone'])) {
                 this.phoneDetail['Phone'] = this.phoneDetail['PersonHomePhone'];
-            }else{
+            } else {
                 this.phoneDetail['Phone'] = phnFieldValue;
                 this.phoneDetail['PersonHomePhone'] = phnFieldValue;
             }
-        }else if(this.phoneDetail['Phone'] != phnFieldValue){
+        } else if(this.phoneDetail['Phone'] != phnFieldValue) {
             this.phoneDetail[this.phoneDetail['PrimaryContactFieldName__c']] = phnFieldValue;
-            if(this.phoneDetail[primaryPhone]==""){
+            if(this.phoneDetail[primaryPhone]=="") {
                 this.phoneDetail['PrimaryContactFieldName__c'] = 'PersonHomePhone';
             }
         }    
     }
-
-   
 
     handleSubmit(event) {
         event.preventDefault();       // stop the form from submitting
         this.updatePhoneNumberFromPhoneField();      
         const fields = event.detail.fields;
         
-        if(this.phoneDetail!= undefined){
+        if(this.phoneDetail!= undefined) {
             fields['PersonAssistantPhone'] = this.phoneDetail['PersonAssistantPhone'];
             fields['PersonHomePhone'] = this.phoneDetail['PersonHomePhone'];
             fields['PersonMobilePhone'] = this.phoneDetail['PersonMobilePhone'];
@@ -318,62 +304,57 @@ export default class DualRecordForm extends LightningElement {
             fields['Phone'] = this.phoneDetail[this.phoneDetail['PrimaryContactFieldName__c']];
             fields['PrimaryContactFieldName__c']= this.phoneDetail['PrimaryContactFieldName__c'];
         }
-    if(this.ptcDetail!= undefined){
-        fields['Permission_to_contact_source__c']= this.ptcDetail['Permission_to_contact_source__c'];
-        fields['Other_Permission_to_contact_Details__c']= this.ptcDetail['Other_Permission_to_contact_Details__c']; 
-        }
-    if(this.sourceDetail!= undefined){
-        fields['Source_Community_organization__c']= this.sourceDetail['Source_Community_organization__c'];
-        fields['Practice_directory__c']= this.sourceDetail['Practice_directory__c'];
-        fields['Source_Referring_member__c']= this.sourceDetail['Source_Referring_member__c'];
-        fields['Referring_member_s_relationship__c']= this.sourceDetail['Referring_member_s_relationship__c'];
-        fields['Event__c']= this.sourceDetail['Event__c'];
-        fields['Source_Keen_campaign__c']= this.sourceDetail['Source_Keen_campaign__c'];
-        }
-    if(this.archiveDetail!= undefined){
 
-        fields['Archive_reason__c']= this.archiveDetail['Archive_reason__c'];
-        fields['Archive_Reason_Other__c']= this.archiveDetail['Archive_Reason_Other__c'];
-
+        if(this.ptcDetail!= undefined) {
+            fields['Permission_to_contact_source__c']= this.ptcDetail['Permission_to_contact_source__c'];
+            fields['Other_Permission_to_contact_Details__c']= this.ptcDetail['Other_Permission_to_contact_Details__c']; 
         }
-    if(this.addressDetail!= undefined){
+
+        if(this.sourceDetail!= undefined) {
+            fields['Source_Community_organization__c']= this.sourceDetail['Source_Community_organization__c'];
+            fields['Practice_directory__c']= this.sourceDetail['Practice_directory__c'];
+            fields['Source_Referring_member__c']= this.sourceDetail['Source_Referring_member__c'];
+            fields['Referring_member_s_relationship__c']= this.sourceDetail['Referring_member_s_relationship__c'];
+            fields['Event__c']= this.sourceDetail['Event__c'];
+            fields['Source_Keen_campaign__c']= this.sourceDetail['Source_Keen_campaign__c'];
+        }
+
+        if(this.archiveDetail!= undefined) {
+            fields['Archive_reason__c']= this.archiveDetail['Archive_reason__c'];
+            fields['Archive_Reason_Other__c']= this.archiveDetail['Archive_Reason_Other__c'];
+        }
+
+        if(this.addressDetail!= undefined) {
             fields["PersonMailingStreet"] = this.addressDetail['PersonMailingStreet'];
-     fields['PersonMailingAddress']= this.addressDetail['PersonMailingAddress'];
-     fields['PersonMailingCountry']= this.addressDetail['PersonMailingCountry'];
-     fields['PersonMailingCity']= this.addressDetail['PersonMailingCity'];
-     fields['PersonMailingStateCode']= this.addressDetail['PersonMailingStateCode'];
-     fields['PersonMailingPostalCode']= this.addressDetail['PersonMailingPostalCode'];
+            fields['PersonMailingAddress']= this.addressDetail['PersonMailingAddress'];
+            fields['PersonMailingCountry']= this.addressDetail['PersonMailingCountry'];
+            fields['PersonMailingCity']= this.addressDetail['PersonMailingCity'];
+            fields['PersonMailingStateCode']= this.addressDetail['PersonMailingStateCode'];
+            fields['PersonMailingPostalCode']= this.addressDetail['PersonMailingPostalCode'];
         }
 
-    if(this.medDetail != undefined){
-
-        fields['MedicareID__c']=  this.medDetail['MedicareID__c'];
-        fields['MedicareEligibilityDate__c']=this.medDetail['MedicareEligibilityDate__c'];
-        fields['PlanEnrollmentDate__c']=this.medDetail['PlanEnrollmentDate__c'];
-        fields['MedcaidID__c']=this.medDetail['MedcaidID__c'];
-        fields['MediaidEligibilityDate__c']=this.medDetail['MediaidEligibilityDate__c'];
-        fields['SSN__c']=this.medDetail['SSN__c'];
-        fields['Medicaid_status_verification_date__c']=this.medDetail['Medicaid_status_verification_date__c'];
+        if(this.medDetail != undefined) {
+            fields['MedicareID__c']=  this.medDetail['MedicareID__c'];
+            fields['MedicareEligibilityDate__c']=this.medDetail['MedicareEligibilityDate__c'];
+            fields['PlanEnrollmentDate__c']=this.medDetail['PlanEnrollmentDate__c'];
+            fields['MedcaidID__c']=this.medDetail['MedcaidID__c'];
+            fields['MediaidEligibilityDate__c']=this.medDetail['MediaidEligibilityDate__c'];
+            fields['SSN__c']=this.medDetail['SSN__c'];
+            fields['Medicaid_status_verification_date__c']=this.medDetail['Medicaid_status_verification_date__c'];
         }
 
-    if(this.otherDetail != undefined){
-
-        fields['Preferred_Language__c']=  this.otherDetail['Preferred_Language__c'];
-        fields['CountryOfOrigin__c']=this.otherDetail['CountryOfOrigin__c'];
-        fields['Military_Vet__c']=this.otherDetail['Military_Vet__c'];
-
+        if(this.otherDetail != undefined) {
+            fields['Preferred_Language__c']=  this.otherDetail['Preferred_Language__c'];
+            fields['CountryOfOrigin__c']=this.otherDetail['CountryOfOrigin__c'];
+            fields['Military_Vet__c']=this.otherDetail['Military_Vet__c'];
         }
 
         this.customValidations(fields);
-
     }
 
     handleSuccess(event) {
-        
-   
         this.recordId = event.detail.id;
         this.showEditField = false;
-        // this.disabledFields = true;
         let temp = JSON.parse(JSON.stringify(this.account.data.fields));
         
         for (const key in temp) {
@@ -388,16 +369,13 @@ export default class DualRecordForm extends LightningElement {
             mode: 'dismissable'
         });
         this.dispatchEvent(evt);
-
     }
+
     handleCancel(event) {
         this.showEditField = false;
-        // this.disabledFields = true;
-
     }
-    handleEdit() {
-        //this.phoneDetail = this.account.data.fields;
 
+    handleEdit() {
         let temp = JSON.parse(JSON.stringify(this.account.data.fields));
         
         for (const key in temp) {
@@ -405,24 +383,20 @@ export default class DualRecordForm extends LightningElement {
         }
         this.phoneDetail = temp;
         this.showEditField = true;
-        //  this.disabledFields = false;
     }
+
     handleLoad(event) {
         this.areDetailsVisible=true; 
-        // window.console.time("LDS call");
         //details coming on the load of form
         // The LDS will take a few seconds to load the component.
         const recUi = event.detail;
-        // window.console.timeEnd("LDS call");
-        //  window.
     }
-    navigateToRecordPage() {
 
+    navigateToRecordPage() {
        window.location.href ='../lightning/r/Account/' +this.recordId+ '/view';
     }
 
-getPhoneDataFromModal(event){
-        //this.phoneDetail = event.detail;
+    getPhoneDataFromModal(event) {
         let temPhnDetail = JSON.parse(JSON.stringify(event.detail));
         if (temPhnDetail.hasOwnProperty("Phone"))
             this.phoneDetail["Phone"]  = temPhnDetail["Phone"];
@@ -436,79 +410,50 @@ getPhoneDataFromModal(event){
             this.phoneDetail["PersonOtherPhone"] = temPhnDetail["PersonOtherPhone"];
         if (temPhnDetail.hasOwnProperty("PrimaryContactFieldName__c"))
             this.phoneDetail["PrimaryContactFieldName__c"] = temPhnDetail["PrimaryContactFieldName__c"];
-
         
-     if(this.phoneDetail[this.phoneDetail["PrimaryContactFieldName__c"]] != null)
-            this.template.querySelector(".primaryPhone").value = this.phoneDetail[this.phoneDetail["PrimaryContactFieldName__c"]];
-        else
-            this.template.querySelector(".primaryPhone").value = this.phoneDetail["Phone"];
+        if(this.template.querySelector(".primaryPhone")) {  //@Fix for EN-1957
+            if(this.phoneDetail[this.phoneDetail["PrimaryContactFieldName__c"]]) {
+                this.template.querySelector(".primaryPhone").value = this.phoneDetail[this.phoneDetail["PrimaryContactFieldName__c"]];
+            } else {
+                this.template.querySelector(".primaryPhone").value = this.phoneDetail["Phone"];
+            }
+        }
+            
         this.isModalOpen = false;
         this.isPhoneChanged = false;
     }
 
-getPTCDataFromModal(event){
-
-    this.ptcDetail =  event.detail;
-        
-        //this.template.querySelector(".primaryPhone").value = this.phoneDetail["Phone"];
+    getPTCDataFromModal(event) {
+        this.ptcDetail =  event.detail;
         this.isModalOpen = false;
     }
-getSourceDataFromModal(event){
 
-    this.sourceDetail =  event.detail;
-        
-        //this.template.querySelector(".primaryPhone").value = this.phoneDetail["Phone"];
+    getSourceDataFromModal(event) {
+        this.sourceDetail =  event.detail;
         this.isModalOpen = false;
     }
-getMeddataFromModal(event){
-        
-   
-    
 
-    this.medDetail =  event.detail;
-        
-        //this.template.querySelector(".primaryPhone").value = this.phoneDetail["Phone"];
+    getMeddataFromModal(event) {
+        this.medDetail =  event.detail;
         this.isMedModalOpen = false;
     }
 
-getOtherDataFromModal(event){
-        
-  
-    this.otherDetail =  event.detail;
-        
-        //this.template.querySelector(".primaryPhone").value = this.phoneDetail["Phone"];
+    getOtherDataFromModal(event) {
+        this.otherDetail =  event.detail;
         this.isOtherModalOpen = false;
     }
 
-getArchiveDataFromModal(event){
-        
-
-
-    this.archiveDetail =  event.detail;
-        
-        //this.template.querySelector(".primaryPhone").value = this.phoneDetail["Phone"];
+    getArchiveDataFromModal(event) {
+        this.archiveDetail =  event.detail;
         this.isModalOpen = false;
     }
 
-getAddressdataFromModal(event){
-        
-
-
-    this.addressDetail =  event.detail;
-
-   let tempAddr = JSON.parse(JSON.stringify( this.addressDetail));
-        
-    this.template.querySelector("lightning-input-field[data-id=addressOutput]").value =  tempAddr.PersonMailingStreet;
-
-        // this.template.querySelector("lightning-output-field[data-id=addressOutput]").value.PersonMailingStreet = tempAddr.PersonMailingStreet;
-        // this.template.querySelector("lightning-output-field[data-id=addressOutput]").value.PersonMailingCity = tempAddr.PersonMailingCity;
-        // this.template.querySelector("lightning-output-field[data-id=addressOutput]").value.PersonMailingCountry = tempAddr.PersonMailingCountry;
-        // this.template.querySelector("lightning-output-field[data-id=addressOutput]").value.PersonMailingStateCode = tempAddr.PersonMailingStateCode;
-        // this.template.querySelector("lightning-output-field[data-id=addressOutput]").value.PersonMailingPostalCode = tempAddr.PersonMailingPostalCode;
-
-
-        //this.template.querySelector(".primaryPhone").value = this.phoneDetail["Phone"];
+    getAddressdataFromModal(event) {
+        this.addressDetail =  event.detail;
+        let tempAddr = JSON.parse(JSON.stringify( this.addressDetail));
+        if(this.template.querySelector("lightning-input-field[data-id=addressOutput]")) {   //@Fix for EN-1957
+            this.template.querySelector("lightning-input-field[data-id=addressOutput]").value =  tempAddr.PersonMailingStreet;
+        }    
         this.isModalOpen = false;
     }
-
 }
