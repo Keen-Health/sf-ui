@@ -62,10 +62,10 @@
             </lightning-layout-item>
             <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
             small-device-size="12" medium-device-size="4">
-            <lightning-input class="fieldvalidate" disabled required label="Date:" name="date" type="date"
-                date-style="short" value={formatedDate} onchange={handleChange}>
-            </lightning-input>
-        </lightning-layout-item>
+                <lightning-input class="fieldvalidate" disabled required label="Date:" name="date" type="date"
+                    date-style="short" value={formatedDate} onchange={handleChange}>
+                </lightning-input>
+            </lightning-layout-item>
             <!-- <lightning-layout-item class="slds-p-vertical_x-small" size="12" small-device-size="12">
                 <div class="slds-grid slds-wrap">
                     <label class="title-heading slds-p-right_medium">Member Signature:</label>
@@ -88,20 +88,20 @@
                 <h2>To be completed by Agent:</h2>
                 <lightning-layout multiple-rows>
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
-                    small-device-size="12" medium-device-size="4">
-                    <lightning-input disabled class="fieldvalidate" required label="Agent name:" name="agentName"
-                        max-length="80" onchange={handleChange} value={inputFieldData.agentName}>
-                    </lightning-input>
-                </lightning-layout-item>
-                <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
-                    small-device-size="12" medium-device-size="4">
-                    <lightning-input class="fieldvalidate" required label="Agent phone:" name="agentPhone"
-                        type="tel" disabled value={inputFieldData.agentPhone} onchange={handleChange}>
-                    </lightning-input>
-                </lightning-layout-item>
+                        small-device-size="12" medium-device-size="4">
+                        <lightning-input disabled class="fieldvalidate" required label="Agent name:" name="agentName"
+                            max-length="80" onchange={handleChange} value={inputFieldData.agentName}>
+                        </lightning-input>
+                    </lightning-layout-item>
+                    <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
+                        small-device-size="12" medium-device-size="4">
+                        <lightning-input class="fieldvalidate" required label="Agent phone:" name="agentPhone"
+                            type="tel" disabled value={inputFieldData.agentPhone} onchange={handleChange}>
+                        </lightning-input>
+                    </lightning-layout-item>
                 </lightning-layout>
                 <lightning-layout multiple-rows>
-                   
+
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
                         small-device-size="12" medium-device-size="4">
                         <lightning-input class="fieldvalidate" required label="Beneficiary first name:"
@@ -122,7 +122,7 @@
                             pattern="[0-9]{10}$" onchange={handleChange} value={inputFieldData.beneficiaryPhone}>
                         </lightning-input>
                     </lightning-layout-item>
-              
+
                     <lightning-layout-item class="slds-p-vertical_small slds-p-right_medium" size="12"
                         small-device-size="12" medium-device-size="4">
                         <lightning-textarea label="Street address:" name="streetAddress" max-length="100"
@@ -321,10 +321,14 @@
 
         <!-- Modal/Popup Box LWC footer starts here -->
         <!-- <footer class="slds-modal__footer"> -->
-        <div class="slds-p-around_large slds-align_absolute-center">
-            <lightning-button label="Cancel" onclick={onCancel}> </lightning-button>
-            <lightning-button label="Submit" variant="brand" class="slds-p-left_small" onclick={submitDetails}>
-            </lightning-button>
+        <div class="slds-p-around_large buttons-container">
+            <lightning-button label="Delete" variant="destructive" onclick={onDelete}> </lightning-button>
+            <div>
+                <lightning-button label="Cancel" onclick={onCancel}> </lightning-button>
+                <lightning-button label="Save" variant="brand"  class="slds-p-left_small" onclick={onSave}> </lightning-button>
+                <lightning-button label="Save & Submit" variant="brand" class="slds-p-left_small" onclick={submitDetails}>
+                </lightning-button>
+            </div>
         </div>
 
     </div>
@@ -371,4 +375,52 @@
         </div>
 
     </div>
+    
+
+    <!-- ToastMessages -->
+    <div  if:true={showErrorToast} >
+        <div class="slds-notify_container slds-is-relative">
+            <div class="slds-notify slds-notify_toast slds-theme_error" role="status">
+              <span class="slds-assistive-text">error</span>
+              <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Description of icon when needed">
+                <lightning-icon icon-name="utility:warning" alternative-text="warning" variant="inverse"
+                size="small"></lightning-icon>
+              </span>
+              <div class="slds-notify__content">
+                <h2 class="slds-text-heading_small ">Can’t save lead “Sally Wong” because
+                   has the same name.</h2>
+              </div>
+              <div class="slds-notify__close">
+                <button class="slds-button slds-button_icon slds-button_icon-inverse" title="Close">
+                    <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                    size="small"></lightning-icon>
+                  <span class="slds-assistive-text">Close</span>
+                </button>
+              </div>
+            </div>
+          </div>
+    </div>
+    
+
+
+      <div   if:true={showSucessToast} class="slds-notify_container slds-is-relative">
+        <div class="slds-notify slds-notify_toast slds-theme_success" role="status">
+          <span class="slds-assistive-text">success</span>
+          <span class="slds-icon_container slds-icon-utility-success slds-m-right_small slds-no-flex slds-align-top" title="Description of icon when needed">
+            <lightning-icon icon-name="utility:success" alternative-text="success" variant="inverse"
+            size="small"></lightning-icon>
+          </span>
+          <div class="slds-notify__content">
+            <h2 class="slds-text-heading_small ">Account
+              <a href="#">ACME - 100</a> widgets was created.</h2>
+          </div>
+          <div class="slds-notify__close">
+            <button class="slds-button slds-button_icon slds-button_icon-inverse" title="Close">
+                <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                size="small"></lightning-icon>
+              <span class="slds-assistive-text">Close</span>
+            </button>
+          </div>
+        </div>
+      </div>
 </template>

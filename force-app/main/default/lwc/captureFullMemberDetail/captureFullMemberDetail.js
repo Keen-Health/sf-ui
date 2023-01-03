@@ -33,6 +33,9 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
     showMembersEvent;
     showPharmacy;
     recordLst;
+    physicianRecordList;
+    medicationsRecordList;
+    pharmacyRecordList;
     records;
     empty;
     subscription = {};
@@ -631,7 +634,7 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
     memberMedicationResult;
 
     handleMedication(event) {
-        this.recordLst = this.memberMedicationResult;
+        this.medicationsRecordList = this.memberMedicationResult;
         this.showMemberMedication = true;
     }
 
@@ -674,7 +677,7 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
     }
 
     handlePhysician(event) {
-        this.recordLst = this.getMemberPhysicianResult;
+        this.physicianRecordList = this.getMemberPhysicianResult;
         this.showMemberPhysician = true;
     }
 
@@ -689,7 +692,7 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
     }
 
     handlePharmacyClick(event) {
-        this.recordLst = this.memberPharmacies;
+        this.pharmacyRecordList = this.memberPharmacies;
         this.showPharmacy = true;
     }
 
@@ -727,19 +730,19 @@ export default class CaptureFullMemberDetail extends NavigationMixin(LightningEl
        // Fix for EN-1842, skipping conditional refresh and loading everytime    
         refreshApex(this.memberPharmacies)
             .then(() => {
-                this.recordLst = this.memberPharmacies;
+                this.pharmacyRecordList = this.memberPharmacies;
                 this.template.querySelector('[data-id="memberPharmacy"]').label = 'Pharmacies (' + this.memberPharmacies.data.length + ')';
             });
 
         refreshApex(this.memberMedicationResult)
             .then(() => {
-                this.recordLst = this.memberMedicationResult;
+                this.medicationsRecordList = this.memberMedicationResult;
                 this.template.querySelector('[data-id="medications"]').label = 'Medications (' + this.memberMedicationResult.data.length + ')';
             });
 
         refreshApex(this.getMemberPhysicianResult)
             .then(() => {
-                this.recordLst = this.getMemberPhysicianResult;
+                this.physicianRecordList = this.getMemberPhysicianResult;
                 this.template.querySelector('[data-id="physicians"]').label = 'Physicians (' + this.getMemberPhysicianResult.data.length + ')';
             });
         // End of fix for EN-1842    

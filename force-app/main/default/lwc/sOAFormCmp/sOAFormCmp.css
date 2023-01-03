@@ -42,7 +42,7 @@
     }
     
     .disabled-agent-signature{
-        background-color: #ECEBEA;
+        background-color: #ECEBEA;  
         height: 154px;
         width: 304px;
         padding: 30px;
@@ -55,6 +55,11 @@
         padding-top: 0.5rem;
     }
 
+    .buttons-container{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
 
 
     /* .checkboxClass .slds-form-element__control{

@@ -276,7 +276,7 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
         this.member['PersonOtherPhone'] = data['PersonOtherPhone'];
         this.member['county'] = data['County__c'];
         this.member['primaryPhone'] = data['PrimaryContactFieldName__c'] ? data['PrimaryContactFieldName__c'] : "";
-        this.member['primaryContact'] = data['VerifyPagePrimaryContact__c'];
+        this.member['primaryContact'] = data['VerifyPagePrimaryContact__c'] ? data['VerifyPagePrimaryContact__c'] : "none";
         this.updateEnrolledData(data['Enrolled_in_MAP_or_PDP__c']);
         this.member['planYear'] = data['Plan_Year__c'] ? data['Plan_Year__c'] : this.planYearOptions[1].value;
         this.member['gender'] = data['GenderIdentity__c'];

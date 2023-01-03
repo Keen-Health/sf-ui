@@ -109,7 +109,7 @@
                            object-api-name = "MemberMedication__c"
                            title-name="Member's Medications"
                            form-name="New Member Medication"
-                           table-data={recordLst}
+                           table-data={medicationsRecordList}
                            ></c-custom-related-list-cmp>
 
 <c-custom-related-list-cmp onsaving={refreshComponent}
@@ -147,7 +147,7 @@
                          object-api-name = "Member_s_physician__c"
                          title-name="Member's Physicians"
                          form-name="New Member's Physician"
-                         table-data={recordLst}
+                         table-data={physicianRecordList}
                          ></c-custom-related-list-cmp>
 
 
@@ -197,7 +197,7 @@
                          object-api-name = "Member_s_pharmacy__c"
                          title-name="Member's Pharmacies"
                          form-name="Member's Pharmacies"
-                         table-data={recordLst}
+                         table-data={pharmacyRecordList}
                          ></c-custom-related-list-cmp>
 
                          

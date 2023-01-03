@@ -78,6 +78,8 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     agentSignCaptured = false;
     jsPdfInitialized = false;
     showPlanList = false;
+    showErrorToast = false;
+    showSucessToast = false;
 
     toastMesssages = {
         'newAccount' : "Successfully created member record for " +
@@ -158,10 +160,18 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         }
     };
 
+    validVariable(variable) {
+        if (variable === null || variable === "" || variable === undefined ||  variable === "undefined") {
+            return false;
+        }
+        return true;
+    }
+
 
     connectedCallback(){
         console.log("this.recordId " + typeof this.recordId);
-        this.fromHomePage = this.recordId == 'undefined' ||  this.recordId == undefined ? true : false;
+
+        this.fromHomePage = !this.validVariable(this.recordId) ? true : false;
         console.log("this.fromHomePage --->>" +this.fromHomePage );
         if(!this.fromHomePage){
             getAccountInfo({ accountId: this.recordId }).then(memberData => {
@@ -194,6 +204,10 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     onCancel() {
         this.fromHomePage ? this.goToHomePage() : this.goToMemberPage();
     }
+
+    onDelete() {}
+
+    onSave(){}
 
     goToHomePage() {
         this[NavigationMixin.Navigate]({
@@ -313,7 +327,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     }
 
     submitDetails() {
-       console.log("content" + JSON.stringify( this.template.querySelector('.main-container').innerHTML));
+    //    console.log("content" + JSON.stringify( this.template.querySelector('.main-container').innerHTML));
         console.log("----------> ONSUBMIT <------------");
 
 
@@ -347,7 +361,8 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         }
         else {
             console.log("$$$$$ Validation Failed $$$$$");
-            this.showErrorToast('Please fill out all required fields to submit.');
+            this.showErrorToast = true;
+            // this.showErrorToast('Please fill out all required fields to submit.');
         };
 
         // console.log("OnSubmit inputFieldData-->" + JSON.stringify(this.inputFieldData));
@@ -476,13 +491,19 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
     showErrorToast(message) {
         console.log("in the function" + message);
-        const evt = new ShowToastEvent({
-            title: 'Error!',
-            message: message,
-            variant: 'error',
-            mode: 'dismissable'
+        // const evt = new ShowToastEvent({
+        //     title: 'Error!',
+        //     message: message,
+        //     variant: 'error',
+        //     mode: 'dismissable'
+        // });
+
+        sforce.one.showToast({
+            "title": "Error!",
+            "message": "Welcome to salesforce code crack.",
+            "type": "error"
         });
-        this.dispatchEvent(evt);
+        // this.dispatchEvent(evt);
     };
 
 

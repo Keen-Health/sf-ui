@@ -294,7 +294,6 @@ public with sharing class AccountRelatedListController {
                                         WHERE Keen_leads_and_members__c =: id]){
 
             MemberPhysicianWrapper mWrapper = new MemberPhysicianWrapper();
-            //mWrapper.name =cc.Physician_directory__r.First_name__c+' '+cc.Physician_directory__r.name;
             mWrapper.name = String.isNotBlank((String)(cc.Physician_directory__r.First_name__c)) ? ( cc.Physician_directory__r.First_name__c+' '+cc.Physician_directory__r.name ) : (cc.Physician_directory__r.name);
             mWrapper.specialty = cc.Physician_directory__r.Subspecialty__c;
             mWrapper.phone = cc.Physician_directory__r.Phone__c;
