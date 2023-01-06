@@ -341,7 +341,8 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
 
     isDataValid() {
         this.hasErrors = false;
-        let isValid = { mediPharm: true, fieldValid: true, pharmacies: true, primaryContact: true };
+        let isValid = { mediPharm: true, fieldValid: true, medications: true,
+             physicians: true,  pharmacies: true, primaryContact: true };
         this.resetValidationErrors();
         let inputFields = this.template.querySelectorAll('.fieldvalidate');
         inputFields.forEach(inputField => {
@@ -350,52 +351,49 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
                 isValid['fieldValid'] = false;
             }
         });
-        /* inputFields = this.template.querySelectorAll('.conditionalValidate');
-        inputFields.forEach(inputField => {
-            if(!inputField.checkValidity()) {
-                inputField.reportValidity();
-                isValid = false;
-            }
-        }); */
 
 
-        if (this.isMedicationsAvailable && !this.isPharmaciesAvailable) {
+        if (this.isMedicationsFieldVisible && this.isPharmacyFieldVisible &&
+            this.isMedicationsAvailable && !this.isPharmaciesAvailable) {
             isValid['mediPharm'] = false;
             this.validationErrors['mediPharm'] = true;
-            this.hasErrors = true;
         }
 
-        if (!this.validationErrors['mediPharm'] && this.getMemberData('pharmaciesForSF').length === 0 && this.member['isPharmaciesRequired'] === 'y') {
+        if (this.isPharmacyFieldVisible && this.getMemberData('pharmaciesForSF').length === 0 
+            && this.member['isPharmaciesRequired'] === 'y') {
+                
             isValid['pharmacies'] = false;
-            this.validationErrors['pharmacies'] = true;
-            this.hasErrors = true;
+            if(this.validationErrors['mediPharm'] === false){
+                this.validationErrors['pharmacies'] = true;
+            }
         }
 
-        if (this.getMemberData('medicationsForSF').length === 0 && this.member['isMedicationsRequired'] === 'y') {
+        if (this.isMedicationsFieldVisible && this.getMemberData('medicationsForSF').length === 0 
+            && this.member['isMedicationsRequired'] === 'y') {
+
             isValid['medications'] = false;
             this.validationErrors['medications'] = true;
-            this.hasErrors = true;
         }
 
-        if (this.getMemberData('physiciansForSF').length === 0 && this.member['isPhysiciansRequired'] === 'y') {
+        if (this.isDoctorsFieldVisible && this.getMemberData('physiciansForSF').length === 0 
+            && this.member['isPhysiciansRequired'] === 'y') {
+
             isValid['physicians'] = false;
             this.validationErrors['physicians'] = true;
-            this.hasErrors = true;
         }
 
         if (this.getMemberData('primaryContact') == 'email' && this.getMemberData('email') == '') {
+            isValid['primaryContact'] = false;
             this.validationErrors['primaryContact'] = true;
             this.primaryContactErrMsg = 'Email';
-            this.hasErrors = true;
         }
 
         if ((this.getMemberData('primaryContact') == 'phone' || this.getMemberData('primaryContact') == 'text')
             && this.getMemberData('phone') == '') {
+            isValid['primaryContact'] = false;
             this.validationErrors['primaryContact'] = true;
             this.primaryContactErrMsg = 'Phone number';
-            this.hasErrors = true;
         }
-
 
         return isValid;
     }
@@ -407,11 +405,15 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
         const isValid = this.isDataValid();
         let validator = true;
         Object.values(isValid).forEach(val => validator = val && validator);
-        if (validator && !this.hasErrors) { //as per @EN-1728
+
+        console.log("validator: " + JSON.stringify(isValid));
+
+        if (validator) { //as per @EN-1728
             this.saveDataToSF();
-        } else {    //if (!isValid.fieldValid)
+        }else{
             this.showErrorToast('Please fix the error(s) before initiating the data transfer to Sunfire.');
         }
+       
     }
 
     saveDataToSF() {
@@ -466,7 +468,6 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
 
     generateQuote() {
         let req = this.getSunfireRequestObject();
-        //console.log('SunfireRequestObject: '+JSON.stringify(req));
         postCallout({ inputJson: JSON.stringify(req) }).then((response) => {
 
         }).catch((error) => {
@@ -492,7 +493,6 @@ export default class GenerateQuote extends NavigationMixin(LightningElement) {
                      this.GenerateQuoteBtnHelptext = 'Quote generated successfully on ' + this.getFormattedDate(dt.toString()) + '.';
                     // this.showSuccessToast('Quote generated successfully!');
                     this.isGenerateQuoteBtnDisabled = false;
-                    // this.GenerateQuoteBtnHelptext = 'Quote generated successfully on ' + this.getFormattedDate(new Date().toString());
                     this.showSucessResponseModal(bodyData);
                 } else if (statusCode == 405) {
                     this.showErrorToast('Quote generation failed. Please regenerate the quote.');

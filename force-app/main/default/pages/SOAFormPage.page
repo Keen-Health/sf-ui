@@ -3,10 +3,12 @@
     <div id="LightningComponentid" />    
     <script>
     var recordId = "{!$CurrentPage.parameters.recordId}";
+    var soaId = "{!$CurrentPage.parameters.soaId}";
     $Lightning.use("c:SOAFormApp", function() {
         $Lightning.createComponent("c:sOAFormCmp",
           { 
-            "recordId": recordId
+            "recordId": recordId,
+            "soaRecordID": soaId
           },
           "LightningComponentid",
           function(cmp) {

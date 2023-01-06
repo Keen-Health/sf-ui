@@ -10,7 +10,7 @@ public with sharing class SOAFormPDFController {
         system.debug('>>>>>>> ID is: '+ ID);
         soaFormDataList = [SELECT ID,Beneficiary_first_name__c,
                                    Beneficiary_last_name__c
-                                   FROM SOAForm__c WHERE Id='a0s8B00000010QiQAI'];
+                                   FROM SOAForm__c WHERE Id='a0s8B00000016I4QAI'];
         soaFormList.add(new soaWrapper(soaFormDataList[0].Beneficiary_first_name__c,soaFormDataList[0].Beneficiary_last_name__c)); 
         return soaFormList;  
     }      
@@ -25,8 +25,8 @@ public with sharing class SOAFormPDFController {
 
     @AuraEnabled
     public static void fetchSOAForminputData(String soaRecordId){
-        ID = soaRecordId;
-        SOAForm__c soaFormData = [SELECT ID,Beneficiary_first_name__c, Beneficiary_last_name__c FROM SOAForm__c WHERE Id=: soaRecordId];
+        // ID = soaRecordId;
+        // SOAForm__c soaFormData = [SELECT ID,Beneficiary_first_name__c, Beneficiary_last_name__c FROM SOAForm__c WHERE Id=: soaRecordId];
     //    beneficiaryFirstName = soaFormData.Beneficiary_first_name__c;
     }
 

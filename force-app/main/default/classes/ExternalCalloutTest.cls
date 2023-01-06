@@ -6,7 +6,7 @@ private class ExternalCalloutTest {
         //Set mock callout class 
         Test.setMock(HttpCalloutMock.class, new ExternalCalloutMock());
         String inputJson = '{"advisor_credentials":{"advisor_email_id":"TEST@TEST.COM","record_id":"abcdefg"}}';
-        Object response = ExternalCallout.postCallout(JSON.serialize(inputJson));
+        Object response = ExternalCallout.postCallout(inputJson);
         System.assert(response != null);
     }
 }

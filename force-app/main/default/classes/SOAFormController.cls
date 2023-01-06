@@ -1,32 +1,108 @@
 public with sharing class SOAFormController {
 
-
-
-    // public String beneficiaryFirstName;
-
-  
-
- 
-    // public String getBeneficiaryFirstName(){
-    //     beneficiaryFirstName = 'Test';
-    //     return beneficiaryFirstName;
-    // }
-    
     @AuraEnabled
     public static Id createSOARecord(String inputJson){
-        Map<String,Object> soaFormData = (Map<String, Object>) JSON.deserializeUntyped(inputJson);                   
+        system.debug('-------In createSOARecord = '+ inputJson);
+        Map<String,Object> soaFormData = (Map<String, Object>) JSON.deserializeUntyped(inputJson);                  
         SOAForm__c soaForm = new SOAForm__c();
-        soaForm.Beneficiary_first_name__c = (String)soaFormData .get('beneficiaryFirstName');
-        soaForm.Beneficiary_last_name__c = (String)soaFormData .get('beneficiaryLastName');
-         //insert soaForm;
-         Database.SaveResult result;
+        soaForm.Keen_leads_and_members__c = (String)soaFormData.get('Keen_leads_and_members__c');
+        soaForm.Initial_method_of_contact__c = (String)soaFormData.get('Initial_method_of_contact__c');
+        soaForm.Initial_method_of_contact_Other__c = (String)soaFormData.get('Initial_method_of_contact_Other__c');
+        soaForm.Plan_s_the_agent_represented__c = (String)soaFormData.get('Plan_s_the_agent_represented__c');
+        soaForm.Type_of_product_s__c = (String)soaFormData.get('Type_of_product_s__c');
+        soaForm.Carrier_List_Items__c = (String)soaFormData.get('Carrier_List_Items__c');
+        soaForm.State__c = (String)soaFormData.get('State__c');
+        soaForm.City__c = (String)soaFormData.get('City__c');
+        soaForm.County__c = (String)soaFormData.get('County__c');
+        soaForm.Street_address__c = (String)soaFormData.get('Street_address__c');
+        soaForm.Address_line_2__c = (String)soaFormData.get('Address_line_2__c');
+        soaForm.ZIP_code__c = (String)soaFormData.get('ZIP_code__c');
+        soaForm.Name = (String)soaFormData.get('Name');
+        soaForm.Agent_phone__c = (String)soaFormData.get('Agent_phone__c');
+        soaForm.Agent_s_signature__c = (String)soaFormData.get('Agent_s_signature__c');
+        soaForm.Beneficiary_first_name__c = (String)soaFormData.get('Beneficiary_first_name__c');
+        soaForm.Beneficiary_last_name__c = (String)soaFormData.get('Beneficiary_last_name__c');
+        soaForm.Beneficiary_phone__c = (String)soaFormData.get('Beneficiary_phone__c');
+        soaForm.Member_s_signature__c = (String)soaFormData.get('Member_s_signature__c');
+        soaForm.why_SOA_was_not_documented__c = (String)soaFormData.get('why_SOA_was_not_documented__c');
+        soaForm.Date__c = (String)soaFormData.get('Date__c') != null ? date.parse((String)soaFormData.get('Date__c')) : date.parse('01/01/1900');
+        soaForm.Date_of_appointment_completed__c =  (String)soaFormData.get('Date_of_appointment_completed__c') != null ? date.parse((String)soaFormData.get('Date_of_appointment_completed__c')) : date.parse('01/01/1900');
+        soaForm.Signatures_Status__c = (String)soaFormData.get('Signatures_Status__c');
+        if(soaForm.Signatures_Status__c.equals('Both')){
+            soaForm.Completed_Date__c = Datetime.now();
+        }    
+        else{
+            soaForm.Completed_Date__c =  date.parse('01/01/1900'); 
+        }
+        Database.SaveResult result;
          try{
             result = Database.insert(soaForm, false);
+            system.debug('result' + result);
          }catch(DmlException e){
             throw new DMLException('Unable to Perform the DML Operation on Account : ' +e.getMessage());
          }
          return result.ID;
-}
+    }
+
+    @AuraEnabled
+    public static boolean updateSOARec(String soaRecordId,String inputJson){
+        boolean response = false;
+        Map<String,Object> soaFormData = (Map<String, Object>) JSON.deserializeUntyped(inputJson);  
+        SOAForm__c soaForm = new SOAForm__c();
+        soaForm.Id = soaRecordId;
+        soaForm.Initial_method_of_contact__c = (String)soaFormData.get('Initial_method_of_contact__c');
+        soaForm.Initial_method_of_contact_Other__c = (String)soaFormData.get('Initial_method_of_contact_Other__c');
+        soaForm.Plan_s_the_agent_represented__c = (String)soaFormData.get('Plan_s_the_agent_represented__c');
+        soaForm.Type_of_product_s__c = (String)soaFormData.get('Type_of_product_s__c');
+        soaForm.Carrier_List_Items__c = (String)soaFormData.get('Carrier_List_Items__c');
+        soaForm.State__c = (String)soaFormData.get('State__c');
+        soaForm.City__c = (String)soaFormData.get('City__c');
+        soaForm.County__c = (String)soaFormData.get('County__c');
+        soaForm.Street_address__c = (String)soaFormData.get('Street_address__c');
+        soaForm.Address_line_2__c = (String)soaFormData.get('Address_line_2__c');
+        soaForm.ZIP_code__c = (String)soaFormData.get('ZIP_code__c');
+        soaForm.Name = (String)soaFormData.get('Name');
+        soaForm.Agent_phone__c = (String)soaFormData.get('Agent_phone__c');
+        soaForm.Agent_s_signature__c = (String)soaFormData.get('Agent_s_signature__c') ;
+        soaForm.Beneficiary_first_name__c = (String)soaFormData.get('Beneficiary_first_name__c');
+        soaForm.Beneficiary_last_name__c = (String)soaFormData.get('Beneficiary_last_name__c');
+        soaForm.Beneficiary_phone__c = (String)soaFormData.get('Beneficiary_phone__c');
+        soaForm.Member_s_signature__c = (String)soaFormData.get('Member_s_signature__c');
+        soaForm.why_SOA_was_not_documented__c =  (String)soaFormData.get('why_SOA_was_not_documented__c');
+        soaForm.Date__c = (String)soaFormData.get('Date__c') != null ? date.parse((String)soaFormData.get('Date__c')) : date.parse('01/01/1900');
+        soaForm.Date_of_appointment_completed__c =  (String)soaFormData.get('Date_of_appointment_completed__c') != null ? date.parse((String)soaFormData.get('Date_of_appointment_completed__c')) : date.parse('01/01/1900');
+        soaForm.Signatures_Status__c = (String)soaFormData.get('Signatures_Status__c');
+        if(soaForm.Signatures_Status__c.equals('Both')){
+            soaForm.Completed_Date__c = Datetime.now();
+        }    
+        else{
+            soaForm.Completed_Date__c =  date.parse('01/01/1900'); 
+        }
+        Database.SaveResult result = Database.update(soaForm);
+            if(result.isSuccess()){
+                    response = true;   
+            }        
+            return response;
+    }
+
+
+    @AuraEnabled
+    public static boolean deleteSOAFormRec(String soaFormId){
+        boolean response = false;
+        List<SOAForm__c> soaData = [ select Id from SOAForm__c where Id =: soaFormId];
+        Database.DeleteResult[] result = Database.delete(soaData,true);
+        for(Database.DeleteResult delRes: result){
+              if ( !delRes.isSuccess() ) {  
+                for ( Database.Error err : delRes.getErrors() ) {  
+                        System.debug(LoggingLevel.Error, 'The Following Error has occurred with' + err.getStatusCode() + ' Status Code ' + 
+                                            err.getMessage() + 'for the following fields' + err.getFields());  
+                }  
+              } else{
+                  response = true;
+              }
+        }
+        return response;
+    }
  
     @AuraEnabled
     public static List<Account> matchedAccounts(String firstName, String lastName){
@@ -68,12 +144,6 @@ public with sharing class SOAFormController {
        PageReference pref = page.SOAPdfGenerate;
        pref.getParameters().put('id',acc.Id);
        pref.setRedirect(true);
-       // Blob bdata;
-       // if(!test.isRunningTest()){
-       //     bdata = pref.getContent();
-       // }else{
-       //     bdata=blob.valueOf('TestString');
-       // }
        Blob bdata;
        bdata = pref.getContent();
        

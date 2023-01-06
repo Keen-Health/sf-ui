@@ -15,6 +15,11 @@
                     </lightning-button-menu>
                 </lightning-layout>
             </div>
+            <lightning-layout if:false={fromHomePage}>
+                <lightning-datatable class="slds-max-medium-table_stacked-horizontal" key-field="Id"
+                    data={recordListData} hide-checkbox-column = "true" columns={recordListColumn} >
+                </lightning-datatable>
+            </lightning-layout>
         </lightning-card>
     </lightning-layout>
 

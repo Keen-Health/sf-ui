@@ -6,10 +6,15 @@ import { CurrentPageReference } from 'lightning/navigation';
 
 import createAccount from '@salesforce/apex/SOAFormController.createAccount';
 import createSOARecord from '@salesforce/apex/SOAFormController.createSOARecord';
-import fetchSOAForminputData from '@salesforce/apex/SOAFormPDFController.fetchSOAForminputData';
+import updateSOARecord from '@salesforce/apex/SOAFormController.updateSOARec';
+import deleteSOAFormRecord from '@salesforce/apex/SOAFormController.deleteSOAFormRec';
 import getMatchedAccounts from '@salesforce/apex/SOAFormController.matchedAccounts';
-
 import savePDFToSF from '@salesforce/apex/SOAFormController.savePDFToSF';
+
+import fetchSOAForminputData from '@salesforce/apex/SOAFormPDFController.fetchSOAForminputData';
+
+
+
 
 import getAccountInfo from '@salesforce/apex/GenerateQuoteController.getKeenMembersData';
 import getAgentData from '@salesforce/apex/GenerateQuoteController.getAgentData';
@@ -23,6 +28,8 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
     // recordId = '0018B00000JcXjUQAV';
     @api recordId;
+    @api soaRecordID;
+    existingSOARecord = false;
     fromHomePage = true;
     agentInfo;
     memberInfo;
@@ -52,6 +59,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     @track inputFieldData = {
         "typeOfProducts": [],
         "memberSignature": "",
+        "agentSignatureURL": "",
         "agentName": "",
         "agentPhone": "",
         "beneficiaryFirstName": "",
@@ -59,27 +67,28 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         "beneficiaryPhone": "",
         "date": this.formatedDate,
         "explanation": "",
-        "streetAddress": "",
+        "streetAddress": "", 
         "addressLineTwo": "",
         "city": "",
         "zipCode": "",
         "county": "",
         "state": "",
         "intialMethodOfContact": "",
+        "intialMethodOfContactOther": "", 
         "agentSignatureStatus": false,
         "plansByAgent": "all_carriers",
-        "carrierListByAgent": [],
+        "carrierListItems": [],
         "dateOfAppointment": "",
+        "signaturesStatus":"None"
 
     };
+
 
     productType = [];
     memberSignCaptured = false;
     agentSignCaptured = false;
     jsPdfInitialized = false;
     showPlanList = false;
-    showErrorToast = false;
-    showSucessToast = false;
 
     toastMesssages = {
         'newAccount' : "Successfully created member record for " +
@@ -107,46 +116,9 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     };
 
 
-    // @wire(getAccountInfo, { accountId: this.recordId })
-    // wiredMemberData({ error, data }) {
-    //     if (this.validVariable(data)) {
-    //                         console.log("Member Info :data" + data);
-    //                         // let keenMemberAccData = JSON.parse(JSON.stringify(memberData.keenMemberAccountMap));
-    //                         // for (var key in keenMemberAccData) {
-    //                         //     this.memberInfo = keenMemberAccData[key];
-    //                         // }
-    //                         // this.setDataToLocalObj();
-    //                         // console.log("Member Info--->" + JSON.stringify(this.memberInfo))
-    //                     };
-    // }
-
-    // @wire(CurrentPageReference)
-    // getStateParameters(currentPageReference) {
-    //     console.log("--->getStateParameters" + JSON.stringify(currentPageReference));
-
-    //     this.recordId = currentPageReference.state?.recordId;
-    //     console.log("---> getStateParameters  recordId : " + this.recordId);
-    //     this.fromHomePage = this.recordId == "undefined" ||  this.recordId == undefined ? true : false;
-    //     console.log("---> fromHomePage: " + this.fromHomePage );
-    //     if (this.recordId != undefined) {
-    //         getAccountInfo({ accountId: this.recordId }).then(memberData => {
-    //             if (memberData != undefined) {
-    //                 let keenMemberAccData = JSON.parse(JSON.stringify(memberData.keenMemberAccountMap));
-    //                 for (var key in keenMemberAccData) {
-    //                     this.memberInfo = keenMemberAccData[key];
-    //                 }
-    //                 this.setDataToLocalObj();
-    //                 console.log("Member Info--->" + JSON.stringify(this.memberInfo))
-    //             };
-    //         });
-
-    //     }
-    // }
-
-
     @wire(getPickListValues, { objectName: 'Account', selectedField: 'Carrier_list__c' })
     wiredCarrierList({ error, data }) {
-        // console.log("Carrier_list__c--->" + JSON.stringify(data));
+        console.log("Carrier_list__c--->" + JSON.stringify(data));
         if (this.validVariable(data)) {
             this.carrierList = data;
         }
@@ -169,7 +141,10 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
 
     connectedCallback(){
-        console.log("this.recordId " + typeof this.recordId);
+        console.log("this.recordId " +  this.recordId);
+        console.log("this.soaRecordID" + this.soaRecordID);
+
+        this.existingSOARecord = this.validVariable(this.soaRecordID);
 
         this.fromHomePage = !this.validVariable(this.recordId) ? true : false;
         console.log("this.fromHomePage --->>" +this.fromHomePage );
@@ -185,12 +160,29 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
                             };
                         });
             
+        }else if(this.existingSOARecord){
+             console.log("=======> Pending Fetch Record Data <=======")
         }
+    }
+
+    getFormattedDate(date) {
+        let formattedDate = null;
+        const dt = new Date(date.toString());
+        const yyyy = dt.getFullYear();
+        let mm = dt.getMonth() + 1; // Months start from 0!
+        let dd = dt.getDate();
+
+        if (dd < 10) dd = '0' + dd;
+        if (mm < 10) mm = '0' + mm;
+
+        formattedDate = mm + '/' + dd + '/' + yyyy;
+        return formattedDate;
     }
 
     updateDateField(){
         const todaysDate = new Date();
-        this.formatedDate = todaysDate.getFullYear() + '-' + (todaysDate.getMonth() + 1) + '-' + todaysDate.getDate ();    
+        this.formatedDate = todaysDate.getFullYear() + '-' + (todaysDate.getMonth() + 1) + '-' + todaysDate.getDate ();
+        this.inputFieldData['date'] = this.formatedDate;
     }
  
     validVariable(variable) {
@@ -205,9 +197,36 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         this.fromHomePage ? this.goToHomePage() : this.goToMemberPage();
     }
 
-    onDelete() {}
+    onDelete() {
+        if(this.validVariable(this.soaRecordID)){
+            deleteSOAFormRecord({soaFormId : this.soaRecordID }).then((response) => {
+                console.log("--->deleteSOAFormRecord Success ::" + JSON.stringify(response));
+                this.soaRecordID = "";
+            }).catch((error) => {
+                console.error("--->deleteSOAFormRecord Error ::" + JSON.stringify(error));
+            });
+        }
+ 
+    }
 
-    onSave(){}
+    onSave(){
+        const formJson = this.soaFormJSON();
+        this.existingSOARecord = this.validVariable(this.soaRecordID);
+        if(this.existingSOARecord){
+            updateSOARecord({soaRecordId: this.soaRecordID, inputJson: JSON.stringify(formJson) }).then((response) => {
+                console.log("--->OnSAVE Update Success :: " + JSON.stringify(response));
+            }).catch((error) => {
+                console.error("--->OnSAVE Update Error :: " + JSON.stringify(error)); 
+            });
+        }else{
+            createSOARecord({inputJson : JSON.stringify(formJson)}).then((responseSOAId) =>{
+                console.log("---> OnSAVE Create Success ::"  + responseSOAId);
+            }).catch((err)=>{
+                console.error("---> OnSAVE Create Error ::"  + JSON.stringify(err));
+            });
+        };
+
+    }
 
     goToHomePage() {
         this[NavigationMixin.Navigate]({
@@ -279,11 +298,15 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     handleMemberSignature(event) {
         const value = event.target.value;
         if(value != ""){
+            this.inputFieldData['memberSignature'] = value;
             this.isAgentSignatureDisabled = false;
-            this.updateDateField()
+            this.updateDateField();
         }else{
             this.isAgentSignatureDisabled = true;
-             this.formatedDate = "";
+            this.inputFieldData['agentSignatureStatus'] = false;
+            this.inputFieldData['agentSignatureURL'] = false;
+            this.formatedDate = "";
+            this.inputFieldData['date'] = "";
         }
     }
 
@@ -321,21 +344,21 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
     }
 
     getAgentSignature(){
-        const objChild1 = this.template.querySelector('c-signature-Panel');
-        this.inputFieldData['agentSignatureURL'] = JSON.stringify(objChild1.getImageURL());
+        if(this.inputFieldData['agentSignatureStatus']){
+            const objChild1 = this.template.querySelector('c-signature-Panel');
+            this.inputFieldData['agentSignatureURL'] = objChild1.getImageURL();
+        }
+
+        console.log("getAgentSignature" + this.inputFieldData['agentSignatureURL']);
 
     }
 
     submitDetails() {
-    //    console.log("content" + JSON.stringify( this.template.querySelector('.main-container').innerHTML));
         console.log("----------> ONSUBMIT <------------");
-
-
-        // console.log("Agent Signature Image Url--->" + JSON.stringify(objChild1.getImageURL()));
+        console.log("FromHomePage--->" + this.fromHomePage);
 
         const isValid = this.handleCheckValidation();
-
-        console.log("FromHomePage--->" + this.fromHomePage);
+        
         if (isValid && this.fromHomePage) {
             this.getAgentSignature();
             this.isLoading = true;
@@ -356,58 +379,104 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
             this.getAgentSignature();
             console.log("^^^^Existing Account^^^^");
             this.isLoading = true;
-            this.createFormDataRecord();
+            this.existingSOARecord ? this.saveAndGeneratePDF() : this.createAndGeneratePDF();
             // this.generatePDF(this.recordId, msg);
         }
         else {
+            window.alert("Validation Failed!!!");
             console.log("$$$$$ Validation Failed $$$$$");
-            this.showErrorToast = true;
-            // this.showErrorToast('Please fill out all required fields to submit.');
+            this.showErrorToast('Please fill out all required fields to submit.');
         };
-
-        // console.log("OnSubmit inputFieldData-->" + JSON.stringify(this.inputFieldData));
-        // console.log("OnSubmit recordId-->" + this.recordId);
-        // console.log("OnSubmit isValid-->" + typeof isValid + isValid);
 
     };
 
-    createFormDataRecord(){
-        console.log("-----> In CreateFormDataRecord----"); 
-        const sampleJSON = {
-            "beneficiaryFirstName" : "John",
-            "beneficiaryLastName" : "High"
+    updateSignaturesStatus(){
+        this.inputFieldData['signaturesStatus'] = this.inputFieldData['memberSignature'] != "" ? "Member Only" : "None";
+        this.inputFieldData['signaturesStatus'] = this.inputFieldData['memberSignature'] != "" 
+                                                 && this.inputFieldData['agentSignatureStatus']? "Both" : "None"; 
+    }
+
+
+    soaFormJSON(){
+        this.getAgentSignature();
+        this.updateSignaturesStatus();
+        
+        console.log("%%%%%inputFieldData%%%%%      " + JSON.stringify(this.inputFieldData));
+
+        const sfJson = {
+            "Keen_leads_and_members__c": this.recordId,
+            "Initial_method_of_contact__c": this.inputFieldData['intialMethodOfContact'], 
+            "Initial_method_of_contact_Other__c": this.inputFieldData['intialMethodOfContactOther'],
+            "Plan_s_the_agent_represented__c": this.inputFieldData['plansByAgent'],
+            "Type_of_product_s__c": this.inputFieldData['typeOfProducts'].join(';'),
+            "Carrier_List_Items__c": this.inputFieldData['carrierListItems'].join(';'),
+            "State__c": this.inputFieldData['state'],
+            "City__c": this.inputFieldData['city'],
+            "County__c": this.inputFieldData['county'],
+            "Street_address__c": this.inputFieldData['streetAddress'],
+            "Address_line_2__c": this.inputFieldData['addressLineTwo'],
+            "ZIP_code__c": this.inputFieldData['zipCode'],
+            "Name": this.inputFieldData['agentName'],
+            "Agent_phone__c": this.inputFieldData['agentPhone'],
+            "Agent_s_signature__c": this.inputFieldData['agentSignatureURL'],
+            "Signatures_Status__c": this.inputFieldData['signaturesStatus'],
+            "Beneficiary_first_name__c": this.inputFieldData['beneficiaryFirstName'],
+            "Beneficiary_last_name__c": this.inputFieldData['beneficiaryLastName'],
+            "Beneficiary_phone__c": this.inputFieldData['beneficiaryPhone'],
+            "Member_s_signature__c": this.inputFieldData['memberSignature'],
+            "why_SOA_was_not_documented__c": this.inputFieldData['explanation'],
+            "Date__c" : this.validVariable(this.inputFieldData['date'])? this.getFormattedDate(this.inputFieldData['date']) : null , 
+            "Date_of_appointment_completed__c": this.validVariable(this.inputFieldData['dateOfAppointment']) ?
+                                                this.getFormattedDate(this.inputFieldData['dateOfAppointment']) : null ,
+            "Completed_Date__c": '01/01/1900'
         }
-        createSOARecord({inputJson : JSON.stringify(sampleJSON)}).then((responseSOAId) =>{
-          console.log("responseSOAId>>>" + responseSOAId);
-          // {soaRecordId : responseSOAId}
-          fetchSOAForminputData({soaRecordId : responseSOAId}).then(res =>{
-            console.log("fetchSOAForminputData Sucessful response" + JSON.stringify(res));
-            setTimeout(()=>{ this.generatePDF();}, 3000);
-           
-          }).catch(err =>{console.log("fetchSOAForminputData Error: " + JSON.stringify(err))});
-       
-        }).catch((err) =>{console.log("createSOARecord Error "+ JSON.stringify(err))});
+        console.log("****** sfJson *******"+ JSON.stringify(sfJson)); 
+        return sfJson;
+    }
+
+    createAndGeneratePDF(){
+        const formJson = this.soaFormJSON();
+        createSOARecord({inputJson : JSON.stringify(formJson)}).then((responseSOAId) =>{
+          this.soaRecordID = responseSOAId;
+          console.log("--->>> Newly Generated SOA Record ID::: " + responseSOAId);
+          this.generatePDF();
+        }).catch((err) =>{
+            console.log("createSOARecord Error "+ JSON.stringify(err))
+        });
+    };
+
+    saveAndGeneratePDF(){
+        const formJson = this.soaFormJSON();
+        updateSOARecord({soaRecordId: this.soaRecordID, inputJson: JSON.stringify(formJson) }).then((response) => {
+            console.log("--->updateSOAFormRecord Success :: " + JSON.stringify(response));
+            this.generatePDF();
+        }).catch((error) => {
+            console.error("--->updateSOAFormRecord Error :: " + JSON.stringify(error)); 
+        });
     }
 
     generatePDF() {
-        const id = this.recordId;
-        console.log("generatePDF ID--->" + id);     
-        savePDFToSF({ accoundId: id }).then((data) => {
-            console.log("---->>> PDF SAVED--ID:" + id);
-            const msg = this.fromHomePage ? this.toastMesssages['newAccount'] : this.toastMesssages['existingAccount'];
-            this.showSuccessToast(msg);
-            this.isLoading = false;
-            // this.goToMemberPage();
- 
-        }).catch(error => { 
-            console.error("savePDFToSFEE Error-->" + JSON.stringify(error)) 
-
-            // const msg = this.fromHomePage ? this.toastMesssages['newAccount'] : this.toastMesssages['existingAccount'];
-
-            // this.showSuccessToast(msg);
-            // this.goToMemberPage();
-            
-        });
+        fetchSOAForminputData({soaRecordId : this.soaRecordID}).then(res =>{
+            console.log("--->fetchSOAForminputData Success:: " + JSON.stringify(res));
+            const id = this.recordId;
+            savePDFToSF({ accoundId: id }).then((data) => {
+                console.log("---->>>savePDFToSF Success::  " + id);
+                const msg = this.fromHomePage ? this.toastMesssages['newAccount'] : this.toastMesssages['existingAccount'];
+                this.showSuccessToast(msg);
+                this.isLoading = false;
+                // this.goToMemberPage();
+     
+            }).catch(error => { 
+                console.error("---> savePDFToSF Error-->" + JSON.stringify(error)) 
+    
+                // const msg = this.fromHomePage ? this.toastMesssages['newAccount'] : this.toastMesssages['existingAccount'];
+    
+                // this.showSuccessToast(msg);
+                // this.goToMemberPage();
+                
+            });
+            // setTimeout(()=>{ this.generatePDF();}, 3000);
+          }).catch(err =>{console.error("fetchSOAForminputData Error: " + JSON.stringify(err))});
 
         // );
     }
@@ -421,7 +490,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
             item['nameUrl'] = '/lightning/r/Account/' + item['Id'] + '/view';
             this.dupModaldata = duplicateData;
         });
-    }
+    };
 
     createMemberAccount() {
         const jSONstr = {
@@ -444,7 +513,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
                 console.log("--->Member Account Created successfully---" + JSON.stringify(response));
 
                 
-                this.createFormDataRecord();
+                this.createAndGeneratePDF();
                 // this.generatePDF(id, msg);
 
             })
@@ -470,7 +539,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
         // const msg = "Successfully added SOA to " +
         //     this.inputFieldData['beneficiaryFirstName'] + " " + this.inputFieldData['beneficiaryLastName'] +
         //     " and associated the SOA";
-        this.createFormDataRecord();
+        this.createAndGeneratePDF();
     }
 
     closeDupModal() {
@@ -509,7 +578,7 @@ export default class SOAFormCmp extends NavigationMixin(LightningElement) {
 
     get productTypeOptions() {
         return [
-            { label: 'Stand-alone Medicare Prescription Drug Plans (Part D)', value: 'stand_alone_medicare-partd' },
+            { label: 'Stand-alone Medicare Prescription Drug Plans (Part D)', value: 'stand_alone_medicare_partd' },
             { label: 'Medicare Advantage Plans (Part C) and Cost Plans', value: 'medicare_adv_partc' },
             { label: 'Dental/Vision/Hearing Products', value: 'dental_vision_hearing_prd' },
             { label: 'Hospital Indemnity Products', value: 'hsptl_indem' },
